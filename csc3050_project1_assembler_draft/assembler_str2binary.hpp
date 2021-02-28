@@ -445,9 +445,26 @@ string sltu_str2binary(string rd, string rs, string rt){
 }
 
 // 34.slti
+string slti_str2binary(string rt, string rs, string imm){
+    string op = "001010";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    imm = intTo16BitBinarySigned(imm);
+    string result = op + rs + rt + imm;
+    return result;
+}
 
 // 35.sltiu
+string sltiu_str2binary(string rt, string rs, string imm){
+    string op = "001011";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    imm = intTo16BitBinarySigned(imm);
+    string result = op + rs + rt + imm;
+    return result;
+}
 
+//Page A-58
 // 36.beq
 
 // 37.bgez

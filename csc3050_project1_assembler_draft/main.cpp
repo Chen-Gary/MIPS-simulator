@@ -77,49 +77,71 @@ string str2binary(vector<string>* line) {
     else if (indicator == "mul")
         result = mul_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 14. madd
-
+    else if (indicator == "madd")
+        result = madd_str2binary((*line)[1], (*line)[2]);
     // 15. msub
-
+    else if (indicator == "msub")
+        result = msub_str2binary((*line)[1], (*line)[2]);
     // 16. maddu
-
+    else if (indicator == "maddu")
+        result = maddu_str2binary((*line)[1], (*line)[2]);
     // 17.msubu
-
+    else if (indicator == "msubu")
+        result = msubu_str2binary((*line)[1], (*line)[2]);
     // 18.nor
-
+    else if (indicator == "nor")
+        result = nor_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 19.or
-
+    else if (indicator == "or")
+        result = or_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 20.ori
-
+    else if (indicator == "ori")
+        result = ori_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 21.sll
-
+    else if (indicator == "sll")
+        result = sll_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 22.sllv
-
+    else if (indicator == "sllv")
+        result = sllv_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 23.sra
-
+    else if (indicator == "sra")
+        result = sra_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 24.srav
-
+    else if (indicator == "srav")
+        result = srav_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 25.srl
-
+    else if (indicator == "srl")
+        result = srl_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 26.srlv
-
+    else if (indicator == "srlv")
+        result = srlv_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 27.sub
-
+    else if (indicator == "sub")
+        result = sub_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 28.subu
-
+    else if (indicator == "subu")
+        result = subu_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 29.xor
-
+    else if (indicator == "xor")
+        result = xor_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 30.xori
-
+    else if (indicator == "xori")
+        result = xori_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 31.lui
-
+    else if (indicator == "lui")
+        result = lui_str2binary((*line)[1], (*line)[2]);
     // 32.slt
-
+    else if (indicator == "slt")
+        result = slt_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 33.sltu
-
+    else if (indicator == "sltu")
+        result = sltu_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 34.slti
-
+    else if (indicator == "slti")
+        result = slti_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 35.sltiu
-
+    else if (indicator == "sltiu")
+        result = sltiu_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 36.beq
 
     // 37.bgez
@@ -207,9 +229,6 @@ string str2binary(vector<string>* line) {
     // 78.syscall
 
 
-    // debug
-    cout << result << endl;
-
     return result;
 }
 
@@ -264,6 +283,11 @@ int main() {
     // translate instructions to 32-bit binary strings line by line
     for (vector<string>* line : instructions) {
         instructionsBinary.push_back( str2binary(line) );
+    }
+
+    // debug
+    for (string machineCode : instructionsBinary){
+        cout << "In `instructionsBinary`: " << machineCode << endl;
     }
 
 
