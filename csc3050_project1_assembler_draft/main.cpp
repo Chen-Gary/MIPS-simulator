@@ -33,7 +33,7 @@ void tokenizeLine(const string & str, vector<string> * tokens) {
 
 // input a tokenized line of instruction
 // return the corresponding binary code
-string str2binary(vector<string>* line) {
+string str2binary(vector<string>* line, int currentLineNum, const map<string, int> & label2offset) {
     string result;
 
     string indicator = (*line)[0];
@@ -143,7 +143,8 @@ string str2binary(vector<string>* line) {
     else if (indicator == "sltiu")
         result = sltiu_str2binary((*line)[1], (*line)[2], (*line)[3]);
     // 36.beq
-
+    else if (indicator == "beq")
+        result = beq_str2binary((*line)[1], (*line)[2], (*line)[3], currentLineNum, label2offset);
     // 37.bgez
 
     // 38.bgezal
@@ -281,13 +282,23 @@ int main() {
     }
 
     // translate instructions to 32-bit binary strings line by line
-    for (vector<string>* line : instructions) {
-        instructionsBinary.push_back( str2binary(line) );
+    for (int lineIndex=0; lineIndex<instructions.size(); lineIndex++){
+        // `lineIndex` is the number of current line of instruction
+        // ranging from 0, 1, 2,..., (instructions.size()-1)
+        // with the info of `label2offset`, the offset can be calculated
+        instructionsBinary.push_back( str2binary( instructions[lineIndex], lineIndex, label2offset ) );
     }
+//    for (vector<string>* line : instructions) {
+//        instructionsBinary.push_back( str2binary(line) );
+//    }
 
     // debug
     for (string machineCode : instructionsBinary){
         cout << "In `instructionsBinary`: " << machineCode << endl;
+    }
+    cout << "check the label map: " << endl;
+    for (auto i : label2offset) {
+        cout << i.first << " : " << i.second << endl;
     }
 
 
@@ -301,9 +312,7 @@ int main() {
 //        cout << endl;
 //    }
 //    cout << "\noutput map:" << endl;
-//    for (auto i : label2offset) {
-//        cout << i.first << " : " << i.second << endl;
-//    }
+
 
 
     // free memory

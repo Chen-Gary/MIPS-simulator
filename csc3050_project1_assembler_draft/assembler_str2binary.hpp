@@ -6,6 +6,7 @@
 #include <bitset>
 using namespace std;
 
+// global var!!!
 const map<string, string> registerMap = {
         {"$zero", "00000"}, // 0
         {"$at", "00001"},    // 1
@@ -62,6 +63,19 @@ string shamtStrToBinary(const string & str){ // I am not sure how to deal with s
     string result = bitset<5>(decimal).to_string();
     return result;
 }
+
+// I am not sure about the calculation of `offset`
+string label2offset16bit(const string & label, int currentLineNum, const map<string, int> & label2offset){
+    // get the lineNum of target line of instruction
+    // ranging from {0, 1, 2,...}
+    int targetLineNum = label2offset.find(label)->second;
+    // PC = PC + 4 + offset*4
+    // offset = targetLineNum - currentLineNum
+    int difference = targetLineNum - currentLineNum;
+    string offset = bitset<16>(difference).to_string();
+    return offset;
+}
+
 
 // 1. add
 string add_str2binary(string rd, string rs, string rt){
@@ -464,9 +478,15 @@ string sltiu_str2binary(string rt, string rs, string imm){
     return result;
 }
 
-//Page A-58
 // 36.beq
-
+string beq_str2binary(string rs, string rt, const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000100";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 37.bgez
 
 // 38.bgezal
