@@ -70,8 +70,8 @@ string label2offset16bit(const string & label, int currentLineNum, const map<str
     // ranging from {0, 1, 2,...}
     int targetLineNum = label2offset.find(label)->second;
     // PC = PC + 4 + offset*4
-    // offset = targetLineNum - currentLineNum
-    int difference = targetLineNum - currentLineNum;
+    // offset = targetLineNum - currentLineNum - 1
+    int difference = targetLineNum - currentLineNum - 1;
     string offset = bitset<16>(difference).to_string();
     return offset;
 }
@@ -488,7 +488,14 @@ string beq_str2binary(string rs, string rt, const string & label, int currentLin
     return result;
 }
 // 37.bgez
-
+string bgez_str2binary(string rs, const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "00001";
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 38.bgezal
 
 // 39.bgtz

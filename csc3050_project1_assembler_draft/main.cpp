@@ -146,7 +146,8 @@ string str2binary(vector<string>* line, int currentLineNum, const map<string, in
     else if (indicator == "beq")
         result = beq_str2binary((*line)[1], (*line)[2], (*line)[3], currentLineNum, label2offset);
     // 37.bgez
-
+    else if (indicator == "bgez")
+        result = bgez_str2binary((*line)[1], (*line)[2], currentLineNum, label2offset);
     // 38.bgezal
 
     // 39.bgtz
@@ -233,7 +234,7 @@ string str2binary(vector<string>* line, int currentLineNum, const map<string, in
     return result;
 }
 
-
+// assembler: when seeing `.text`, this program starts to translate mips instruction to binary strings
 int main() {
 
     vector< vector<string>* > instructions;      // store all lines of instructions, each as a nested vector (pointer)
@@ -245,6 +246,11 @@ int main() {
     ifstream inputFile(".text");
     string line;
     while (getline(inputFile, line)) {
+        // if the first line of instruction is `.text`, simply ignore it
+        if (line == ".text") {
+            //cout << "remove `.text`" << endl; //debug
+            continue;
+        }
 
         // find and remove comment in the line
         size_t posComment = line.find_first_of('#');
@@ -292,6 +298,7 @@ int main() {
 //        instructionsBinary.push_back( str2binary(line) );
 //    }
 
+
     // debug
     for (string machineCode : instructionsBinary){
         cout << "In `instructionsBinary`: " << machineCode << endl;
@@ -302,7 +309,6 @@ int main() {
     }
 
 
-
 //    // debug
 //    for (vector<string>* tokens : instructions){
 //        cout << "Line: " << endl;
@@ -311,7 +317,6 @@ int main() {
 //        }
 //        cout << endl;
 //    }
-//    cout << "\noutput map:" << endl;
 
 
 
