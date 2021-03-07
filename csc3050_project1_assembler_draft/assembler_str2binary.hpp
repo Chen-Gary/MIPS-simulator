@@ -88,6 +88,23 @@ string label2offset26bit(const string & target, const map<string, int> & label2o
     return result;
 }
 
+// Used in load/store related instructions
+// e.g. lw $t0, 32($s3)
+// input address = 32($s3) ---> output rs=$s3, offset=32
+void furtherTokenizeForRsAndOffset(const string & address, string & rs, string & offset){
+    size_t indexOpenParenthesis = address.find_first_of('(');
+    size_t indexCloseParenthesis = address.find_first_of(')');
+
+    if (indexOpenParenthesis == string::npos || indexCloseParenthesis == string::npos){
+        cout << "`furtherTokenizeForRsAndOffset` error: no '(' or ')' found in the address!!" << endl;
+        throw;
+    }
+
+    // output rs=$s3, offset=32
+    rs = address.substr(indexOpenParenthesis+1, indexCloseParenthesis-indexOpenParenthesis-1);
+    offset = address.substr(0, indexOpenParenthesis);
+}
+
 // 1. add
 string add_str2binary(string rd, string rs, string rt){
     string op = "000000";
@@ -711,8 +728,25 @@ string tltiu_str2binary(string rs, string imm){
     string result = op + rs + rt + imm;
     return result;
 }
-// 60.lb // 先测试最早写的tokenize
 
+// Note that the unit of `offset` is byte!!
+// e.g. A[8] --> lw $t0, 32($s3)
+// Here 32 = 4 * 8
+
+// 60.lb
+string lb_str2binary(string rt, const string & address){
+    string op = "100000";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
+
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 61.lbu
 
 // 62.lh
@@ -720,7 +754,19 @@ string tltiu_str2binary(string rs, string imm){
 // 63.lhu
 
 // 64.lw
+string lw_str2binary(string rt, const string & address){
+    string op = "100011";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 65.lwl
 
 // 66.lwr

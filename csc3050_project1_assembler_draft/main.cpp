@@ -223,7 +223,8 @@ string str2binary(vector<string>* line, int currentLineNum, const map<string, in
     // 63.lhu
 
     // 64.lw
-
+    else if (indicator == "lw")
+        result = lw_str2binary((*line)[1], (*line)[2]);
     // 65.lwl
 
     // 66.lwr
@@ -331,14 +332,15 @@ int main() {
     }
 
 
-//    // debug
-//    for (vector<string>* tokens : instructions){
-//        cout << "Line: " << endl;
-//        for (string token : *tokens) {
-//            cout << token << "  |  ";
-//        }
-//        cout << endl;
-//    }
+    // debug
+    cout << endl << "Output tokens of each lines" << endl;
+    for (vector<string>* tokens : instructions){
+        cout << "Line: " << endl;
+        for (string token : *tokens) {
+            cout << token << "  |  ";
+        }
+        cout << endl;
+    }
 
 
 
