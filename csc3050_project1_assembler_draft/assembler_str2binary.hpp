@@ -497,19 +497,61 @@ string bgez_str2binary(string rs, const string & label, int currentLineNum, cons
     return result;
 }
 // 38.bgezal
-
+string bgezal_str2binary(string rs, const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "10001";
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 39.bgtz
-
+string bgtz_str2binary(string rs, const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000111";
+    rs = registerMap.find(rs)->second;
+    string rt = "00000";
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 40.blez
-
+string blez_str2binary(string rs, const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000110";
+    rs = registerMap.find(rs)->second;
+    string rt = "00000";
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 41.bltzal
-
+string bltzal_str2binary(string rs, const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "10000";
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 42.bltz
-
+string bltz_str2binary(string rs, const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "00000";
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 43.bne
-
+string bne_str2binary(string rs, string rt,const string & label, int currentLineNum, const map<string, int> & label2offset){
+    string op = "000101";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string offset = label2offset16bit(label, currentLineNum, label2offset);
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 44.j
-
+// Page A-63
 // 45.jal
 
 // 46.jalr

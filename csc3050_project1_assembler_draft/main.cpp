@@ -149,17 +149,23 @@ string str2binary(vector<string>* line, int currentLineNum, const map<string, in
     else if (indicator == "bgez")
         result = bgez_str2binary((*line)[1], (*line)[2], currentLineNum, label2offset);
     // 38.bgezal
-
+    else if (indicator == "bgezal")
+        result = bgezal_str2binary((*line)[1], (*line)[2], currentLineNum, label2offset);
     // 39.bgtz
-
+    else if (indicator == "bgtz")
+        result = bgtz_str2binary((*line)[1], (*line)[2], currentLineNum, label2offset);
     // 40.blez
-
+    else if (indicator == "blez")
+        result = blez_str2binary((*line)[1], (*line)[2], currentLineNum, label2offset);
     // 41.bltzal
-
+    else if (indicator == "bltzal")
+        result = bltzal_str2binary((*line)[1], (*line)[2], currentLineNum, label2offset);
     // 42.bltz
-
+    else if (indicator == "bltz")
+        result = bltz_str2binary((*line)[1], (*line)[2], currentLineNum, label2offset);
     // 43.bne
-
+    else if (indicator == "bne")
+        result = bne_str2binary((*line)[1], (*line)[2], (*line)[3], currentLineNum, label2offset);
     // 44.j
 
     // 45.jal
