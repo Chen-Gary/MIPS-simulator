@@ -215,44 +215,66 @@ string str2binary(vector<string>* line, int currentLineNum, const map<string, in
     else if (indicator == "tltiu")
         result = tltiu_str2binary((*line)[1], (*line)[2]);
     // 60.lb
-
+    else if (indicator == "lb")
+        result = lb_str2binary((*line)[1], (*line)[2]);
     // 61.lbu
-
+    else if (indicator == "lbu")
+        result = lbu_str2binary((*line)[1], (*line)[2]);
     // 62.lh
-
+    else if (indicator == "lh")
+        result = lh_str2binary((*line)[1], (*line)[2]);
     // 63.lhu
-
+    else if (indicator == "lhu")
+        result = lhu_str2binary((*line)[1], (*line)[2]);
     // 64.lw
     else if (indicator == "lw")
         result = lw_str2binary((*line)[1], (*line)[2]);
     // 65.lwl
-
+    else if (indicator == "lwl")
+        result = lwl_str2binary((*line)[1], (*line)[2]);
     // 66.lwr
-
+    else if (indicator == "lwr")
+        result = lwr_str2binary((*line)[1], (*line)[2]);
     // 67.ll
-
+    else if (indicator == "ll")
+        result = ll_str2binary((*line)[1], (*line)[2]);
     // 68.sb
-
+    else if (indicator == "sb")
+        result = sb_str2binary((*line)[1], (*line)[2]);
     // 69.sh
-
+    else if (indicator == "sh")
+        result = sh_str2binary((*line)[1], (*line)[2]);
     // 70.sw
-
+    else if (indicator == "sw")
+        result = sw_str2binary((*line)[1], (*line)[2]);
     // 71.swl
-
+    else if (indicator == "swl")
+        result = swl_str2binary((*line)[1], (*line)[2]);
     // 72.swr
-
+    else if (indicator == "swr")
+        result = swr_str2binary((*line)[1], (*line)[2]);
     // 73.sc
-
+    else if (indicator == "sc")
+        result = sc_str2binary((*line)[1], (*line)[2]);
     // 74.mfhi
-
+    else if (indicator == "mfhi")
+        result = mfhi_str2binary((*line)[1]);
     // 75.mflo
-
+    else if (indicator == "mflo")
+        result = mflo_str2binary((*line)[1]);
     // 76.mthi
-
+    else if (indicator == "mthi")
+        result = mthi_str2binary((*line)[1]);
     // 77.mtlo
-
+    else if (indicator == "mtlo")
+        result = mtlo_str2binary((*line)[1]);
     // 78.syscall
-
+    else if (indicator == "syscall")
+        result = syscall_str2binary();
+    else{
+        cout << "Unrecognized instruction (indicator)!!" << endl;
+        throw;
+    }
 
     return result;
 }

@@ -748,11 +748,47 @@ string lb_str2binary(string rt, const string & address){
     return result;
 }
 // 61.lbu
+string lbu_str2binary(string rt, const string & address){
+    string op = "100100";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 62.lh
+string lh_str2binary(string rt, const string & address){
+    string op = "100001";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 63.lhu
+string lhu_str2binary(string rt, const string & address){
+    string op = "100101";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 64.lw
 string lw_str2binary(string rt, const string & address){
     string op = "100011";
@@ -768,30 +804,174 @@ string lw_str2binary(string rt, const string & address){
     return result;
 }
 // 65.lwl
+string lwl_str2binary(string rt, const string & address){
+    string op = "100010";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 66.lwr
+string lwr_str2binary(string rt, const string & address){
+    string op = "100110";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 67.ll
+string ll_str2binary(string rt, const string & address){
+    string op = "110000";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 68.sb
+string sb_str2binary(string rt, const string & address){
+    string op = "101000";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 69.sh
+string sh_str2binary(string rt, const string & address){
+    string op = "101001";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 70.sw
+string sw_str2binary(string rt, const string & address){
+    string op = "101011";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 71.swl
+string swl_str2binary(string rt, const string & address){
+    string op = "101010";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 72.swr
+string swr_str2binary(string rt, const string & address){
+    string op = "101110";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 73.sc
+string sc_str2binary(string rt, const string & address){
+    string op = "111000";
+    string rs;
+    rt = registerMap.find(rt)->second;
+    string offset;
 
+    furtherTokenizeForRsAndOffset(address, rs, offset);
+    rs = registerMap.find(rs)->second;
+    offset = intTo16BitBinarySigned(offset);
+
+    string result = op + rs + rt + offset;
+    return result;
+}
 // 74.mfhi
-
+string mfhi_str2binary(string rd){
+    string op = "000000";
+    string rsRt = "0000000000";
+    rd = registerMap.find(rd)->second;
+    string shamt = "00000";
+    string funct = "010000";
+    string result = op + rsRt + rd + shamt + funct;
+    return result;
+}
 // 75.mflo
-
+string mflo_str2binary(string rd){
+    string op = "000000";
+    string rsRt = "0000000000";
+    rd = registerMap.find(rd)->second;
+    string shamt = "00000";
+    string funct = "010010";
+    string result = op + rsRt + rd + shamt + funct;
+    return result;
+}
 // 76.mthi
-
+string mthi_str2binary(string rs){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    string rtRdShamt = "000000000000000";
+    string funct = "010001";
+    string result = op + rs + rtRdShamt + funct;
+    return result;
+}
 // 77.mtlo
-
+string mtlo_str2binary(string rs){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    string rtRdShamt = "000000000000000";
+    string funct = "010011";
+    string result = op + rs + rtRdShamt + funct;
+    return result;
+}
 // 78.syscall
-
+string syscall_str2binary(){
+    string op = "000000";
+    string rsRtRdShamt = "00000000000000000000";
+    string funct = "001100";
+    string result = op + rsRtRdShamt + funct;
+    return result;
+}
