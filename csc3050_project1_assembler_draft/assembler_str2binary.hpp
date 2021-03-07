@@ -636,22 +636,82 @@ string tnei_str2binary(string rs, string imm){
     return result;
 }
 // 52.tge
-// Page A-65
+string tge_str2binary(string rs, string rt){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string rdShamt = "0000000000";
+    string funct = "110000";
+    string result = op + rs + rt + rdShamt + funct;
+    return result;
+}
 // 53.tgeu
-
+string tgeu_str2binary(string rs, string rt){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string rdShamt = "0000000000";
+    string funct = "110001";
+    string result = op + rs + rt + rdShamt + funct;
+    return result;
+}
 // 54.tgei
-
+string tgei_str2binary(string rs, string imm){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "01000";
+    imm = intTo16BitBinarySigned(imm);
+    string result = op + rs + rt + imm;
+    return result;
+}
 // 55.tgeiu
-
+string tgeiu_str2binary(string rs, string imm){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "01001";
+    imm = intTo16BitBinarySigned(imm); //sign-extended value imm, I am not sure
+    string result = op + rs + rt + imm;
+    return result;
+}
 // 56.tlt
-
+string tlt_str2binary(string rs, string rt){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string rdShamt = "0000000000";
+    string funct = "110010";
+    string result = op + rs + rt + rdShamt + funct;
+    return result;
+}
 // 57.tltu
-
+string tltu_str2binary(string rs, string rt){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string rdShamt = "0000000000";
+    string funct = "110011";
+    string result = op + rs + rt + rdShamt + funct;
+    return result;
+}
 // 58.tlti
-
+string tlti_str2binary(string rs, string imm){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "01010";
+    imm = intTo16BitBinarySigned(imm);
+    string result = op + rs + rt + imm;
+    return result;
+}
 // 59.tltiu
-
-// 60.lb
+string tltiu_str2binary(string rs, string imm){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "01011";
+    imm = intTo16BitBinarySigned(imm); //sign-extended value imm, I am not sure
+    string result = op + rs + rt + imm;
+    return result;
+}
+// 60.lb // 先测试最早写的tokenize
 
 // 61.lbu
 

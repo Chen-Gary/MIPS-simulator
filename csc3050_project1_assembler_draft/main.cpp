@@ -170,35 +170,50 @@ string str2binary(vector<string>* line, int currentLineNum, const map<string, in
     else if (indicator == "j")
         result = j_str2binary((*line)[1], label2offset);
     // 45.jal
-
+    else if (indicator == "jal")
+        result = jal_str2binary((*line)[1], label2offset);
     // 46.jalr
-
+    else if (indicator == "jalr")
+        result = jalr_str2binary((*line)[1], (*line)[2]);
     // 47.jr
-
+    else if (indicator == "jr")
+        result = jr_str2binary((*line)[1]);
     // 48.teq
-
+    else if (indicator == "teq")
+        result = teq_str2binary((*line)[1], (*line)[2]);
     // 49.teqi
-
+    else if (indicator == "teqi")
+        result = teqi_str2binary((*line)[1], (*line)[2]);
     // 50.tne
-
+    else if (indicator == "tne")
+        tne_str2binary((*line)[1], (*line)[2]);
     // 51.tnei
-
+    else if (indicator == "tnei")
+        result = tnei_str2binary((*line)[1], (*line)[2]);
     // 52.tge
-
+    else if (indicator == "tge")
+        result = tge_str2binary((*line)[1], (*line)[2]);
     // 53.tgeu
-
+    else if (indicator == "tgeu")
+        result = tgeu_str2binary((*line)[1], (*line)[2]);
     // 54.tgei
-
+    else if (indicator == "tgei")
+        result = tgei_str2binary((*line)[1], (*line)[2]);
     // 55.tgeiu
-
+    else if (indicator == "tgeiu")
+        result = tgeiu_str2binary((*line)[1], (*line)[2]);
     // 56.tlt
-
+    else if (indicator == "tlt")
+        result = tlt_str2binary((*line)[1], (*line)[2]);
     // 57.tltu
-
+    else if (indicator == "tltu")
+        result = tltu_str2binary((*line)[1], (*line)[2]);
     // 58.tlti
-
+    else if (indicator == "tlti")
+        result = tlti_str2binary((*line)[1], (*line)[2]);
     // 59.tltiu
-
+    else if (indicator == "tltiu")
+        result = tltiu_str2binary((*line)[1], (*line)[2]);
     // 60.lb
 
     // 61.lbu
