@@ -569,21 +569,74 @@ string j_str2binary(string target, const map<string, int> & label2offset){
     return result;
 }
 // 45.jal
-
+string jal_str2binary(string target, const map<string, int> & label2offset){
+    string op = "000011";
+    target = label2offset26bit(target, label2offset);
+    string result = op + target;
+    return result;
+}
 // 46.jalr
-
+string jalr_str2binary(string rs, string rd){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    string rt = "00000";
+    rd = registerMap.find(rd)->second;
+    string shamt = "00000";
+    string funct = "001001";
+    string result = op + rs + rt + rd + shamt + funct;
+    return result;
+}
 // 47.jr
-
+string jr_str2binary(string rs){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    string rtRdShamt = "000000000000000";
+    string funct = "001000";
+    string result = op + rs + rtRdShamt + funct;
+    return result;
+}
 // 48.teq
-
+string teq_str2binary(string rs, string rt){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string rdShamt = "0000000000";
+    string funct = "110100";
+    string result = op + rs + rt + rdShamt + funct;
+    return result;
+}
 // 49.teqi
-
+string teqi_str2binary(string rs, string imm){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "01100";
+    imm = intTo16BitBinarySigned(imm);
+    string result = op + rs + rt + imm;
+    return result;
+}
 // 50.tne
-
+// typo in the textbook????
+string tne_str2binary(string rs, string rt){
+    string op = "000000";
+    rs = registerMap.find(rs)->second;
+    rt = registerMap.find(rt)->second;
+    string rdShamt = "0000000000";
+    string funct = "110110";
+    string result = op + rs + rt + rdShamt + funct;
+    return result;
+}
 // 51.tnei
-
+// typo in the textbook????
+string tnei_str2binary(string rs, string imm){
+    string op = "000001";
+    rs = registerMap.find(rs)->second;
+    string rt = "01110";
+    imm = intTo16BitBinarySigned(imm);
+    string result = op + rs + rt + imm;
+    return result;
+}
 // 52.tge
-
+// Page A-65
 // 53.tgeu
 
 // 54.tgei
