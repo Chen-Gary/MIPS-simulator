@@ -167,7 +167,8 @@ string str2binary(vector<string>* line, int currentLineNum, const map<string, in
     else if (indicator == "bne")
         result = bne_str2binary((*line)[1], (*line)[2], (*line)[3], currentLineNum, label2offset);
     // 44.j
-
+    else if (indicator == "j")
+        result = j_str2binary((*line)[1], label2offset);
     // 45.jal
 
     // 46.jalr

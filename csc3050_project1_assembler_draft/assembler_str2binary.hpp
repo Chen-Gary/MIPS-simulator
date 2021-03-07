@@ -76,6 +76,17 @@ string label2offset16bit(const string & label, int currentLineNum, const map<str
     return offset;
 }
 
+// for j-instructions
+// I am not sure about the calculation of `target`
+string label2offset26bit(const string & target, const map<string, int> & label2offset){
+    int targetLineNum = label2offset.find(target)->second;
+    // realTargetAddress = 0x400000 + targetLineNum * 4
+    uint32_t realTargetAddress = 4194304 + targetLineNum * 4;
+    string realTargetAddressStr = bitset<32>(realTargetAddress).to_string();
+    // realTargetAddressStr = "PC first 4" + "target26" + "00"
+    string result = realTargetAddressStr.substr(4, 26);
+    return result;
+}
 
 // 1. add
 string add_str2binary(string rd, string rs, string rt){
@@ -551,7 +562,12 @@ string bne_str2binary(string rs, string rt,const string & label, int currentLine
     return result;
 }
 // 44.j
-// Page A-63
+string j_str2binary(string target, const map<string, int> & label2offset){
+    string op = "000010";
+    target = label2offset26bit(target, label2offset);
+    string result = op + target;
+    return result;
+}
 // 45.jal
 
 // 46.jalr
