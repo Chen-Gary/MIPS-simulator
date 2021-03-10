@@ -103,6 +103,9 @@ void furtherTokenizeForRsAndOffset(const string & address, string & rs, string &
     // output rs=$s3, offset=32
     rs = address.substr(indexOpenParenthesis+1, indexCloseParenthesis-indexOpenParenthesis-1);
     offset = address.substr(0, indexOpenParenthesis);
+    // handle cases, e.g. sb $a1, ($a0)
+    if (offset.empty())
+        offset = "0";
 }
 
 // 1. add
