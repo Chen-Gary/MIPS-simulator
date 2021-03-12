@@ -9,6 +9,7 @@
  */
 
 
+#include "io_related.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -995,18 +996,7 @@ string syscall_str2binary(){
 
 
 // The following are functions originally in `main.cpp`
-// tokenize input str, and store the tokens in a vector
-void tokenizeLine(const string & str, vector<string> * tokens) {
-    size_t prev=0, pos;
-    // delimiters: space, comma, tab
-    while ((pos = str.find_first_of(" ,\t", prev)) != string::npos) {
-        if (pos > prev)
-            tokens->push_back(str.substr(prev, pos-prev));
-        prev = pos + 1;
-    }
-    if (prev < str.length())
-        tokens->push_back(str.substr(prev, string::npos));
-}
+
 
 // input a tokenized line of instruction
 // return the corresponding binary code
