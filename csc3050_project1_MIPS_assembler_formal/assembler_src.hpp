@@ -57,21 +57,21 @@ const map<string, string> registerMap = {
 
 // The following are the functions used in `XXX_str2binary` functions
 string intTo16BitBinarySigned(const string & str) {
-    int decimal = stoi(str);
+    int decimal = stoi(str, nullptr, 0);
     // int to 16-bit signed binary string
     string result = bitset<16>(decimal).to_string();
     return result;
 }
 
 string intTo16BitBinaryUnsigned(const string & str){
-    unsigned decimal = stoul(str);
+    unsigned decimal = stoi(str, nullptr, 0);
     // unsigned to 16-bit unsigned binary string
     string result = bitset<16>(decimal).to_string();
     return result;
 }
 
 string shamtStrToBinary(const string & str){ // I am not sure how to deal with shamt
-    int decimal = stoi(str);
+    int decimal = stoi(str, nullptr, 0);
     // int to 5-bit binary string
     string result = bitset<5>(decimal).to_string();
     return result;
