@@ -1,4 +1,5 @@
 #include "assembler_src.hpp"
+#include "simulator_draft.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -46,17 +47,25 @@ int main() {
     // now the `instructionsBinary` is ready
 
 
-
-
-    // do other things
-    // debug
-    cout << "rawDataSegment: " << endl;
-    for (const string & oneline : rawDataSegment)
-        cout << oneline << endl;
-    cout << "rawTextSegment: " << endl;
-    for (const string & oneline : rawTextSegment)
-        cout << oneline << endl;
+    //debug
     cout << "Assembler result: " << endl;
     for (const string & machineCode : instructionsBinary)
         cout << machineCode << endl;
+
+
+    // start simulator
+    startSimulator(instructionsBinary);
+
+
+//    // do other things
+//    // debug
+//    cout << "rawDataSegment: " << endl;
+//    for (const string & oneline : rawDataSegment)
+//        cout << oneline << endl;
+//    cout << "rawTextSegment: " << endl;
+//    for (const string & oneline : rawTextSegment)
+//        cout << oneline << endl;
+//    cout << "Assembler result: " << endl;
+//    for (const string & machineCode : instructionsBinary)
+//        cout << machineCode << endl;
 }
