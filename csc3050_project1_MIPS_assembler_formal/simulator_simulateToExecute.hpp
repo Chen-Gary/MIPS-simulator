@@ -2,45 +2,76 @@
  * This file contains the function, `simulateToExecute`
  */
 
+#include "simulator_instruction_functions.hpp"
 #include <bitset>
 using namespace std;
 
 
-void simulateToExecute(const uint32_t* PC, const map<string, uint32_t*> & str2SimulatedRegister){
-    uint32_t instruction = *PC; // fetch instruction
+int32_t signExtendedImm(uint32_t instruction){
+    int32_t instructionSigned = (int32_t) instruction;
+    int32_t imm_signExtended = (instructionSigned << 16) >>16;
+    return imm_signExtended;
+}
+
+uint32_t zeroExtendedImm(uint32_t instruction){
+    uint32_t imm_zeroExtended = (instruction << 16) >> 16;
+    return imm_zeroExtended;
+}
+
+// Note that in this implementation we do not check which type (R, I or J) the current instruction is.
+// Instead we directly use `op` and `funct` to identify which instruction PC_realAddr currently points to
+void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & str2SimulatedRegister){
+    uint32_t instruction = *PC_realAddr; // fetch instruction
+    PC_realAddr++; // PC = PC + 4
+
     string instructionStr = bitset<32>(instruction).to_string();
 
     // R-type: op + rs + rt + rd + shamt + funct
     // I-type: op + rs + rt + imm
     // J-type: op + addr
+
+    // `op` and `funct` identify which instruction PC_realAddr currently points to
     string op = instructionStr.substr(0, 6);        // op_str
+    string funct = instructionStr.substr(26, 6);    //funct_str
+
+    // get `rs`, `rt`, `rd`
+    // although it is nonsense in some cases, e.g. there is no `rd` in I-type instruction
     string rs_str = instructionStr.substr(6, 5);
     string rt_str = instructionStr.substr(11, 5);
     string rd_str = instructionStr.substr(16, 5);
-    string shamt_str = instructionStr.substr(21, 5);
-    string funct = instructionStr.substr(26, 6);    //funct_str
-    string imm_str = instructionStr.substr(16, 16);
-    string addr = instructionStr.substr(6, 26);     // addr_str
+    uint32_t* rs = str2SimulatedRegister.find(rs_str)->second;
+    uint32_t* rt = str2SimulatedRegister.find(rt_str)->second;
+    uint32_t* rd = str2SimulatedRegister.find(rd_str)->second;
 
-    // 会出错！！！
-//    uint32_t* rs = str2SimulatedRegister.find(rs_str)->second;
-//    uint32_t* rt = str2SimulatedRegister.find(rt_str)->second;
-//    uint32_t* rd = str2SimulatedRegister.find(rd_str)->second;
-//    // shamt_str --> shamt
-//    // imm_str --> imm
+    // get `imm` (both sign-extended and zero-extended)
+    // again it might be nonsense to do this for some instructions
+    int32_t imm_signExtended = signExtendedImm(instruction);
+    uint32_t imm_zeroExtended = zeroExtendedImm(instruction);
+
+    // get `v0_reg` (do this for `syscall` instruction)
+    uint32_t* v0_reg = str2SimulatedRegister.find("00010")->second;
+    uint32_t* a0_reg = str2SimulatedRegister.find("00100")->second;
+
+    // useless codes here
+    //string shamt_str = instructionStr.substr(21, 5);
+    //string imm_str = instructionStr.substr(16, 16);
+    //string addr = instructionStr.substr(6, 26);     // addr_str
+
 
 
     // check which instruction to execute
     // 1. add
     if (op == "000000" && funct == "100000")
-        cout << "add!!" << endl;
+        add_toExecute(rs, rt, rd);
     // 2. addu
-
+    else if (op == "000000" && funct == "100001")
+        addu_toExecute(rs, rt, rd);
     // 3. addi
     else if (op == "001000")
-        cout << "addi!!" << endl;
+        addi_toExecute(rs, rt, imm_signExtended);
     // 4. addiu
-
+    else if (op == "001001")
+        addiu_toExecute(rs, rt, imm_signExtended);
     // 5.and
 
     // 6. andi
@@ -189,7 +220,7 @@ void simulateToExecute(const uint32_t* PC, const map<string, uint32_t*> & str2Si
 
     // 78.syscall
     else if (op == "000000" && funct == "001100")
-        cout << "syscall!!" << endl;
+        syscall_toExecute(v0_reg, a0_reg);
     else {
         cout << "Unrecognized instruction in `simulateToExecute()`" << endl;
         throw;

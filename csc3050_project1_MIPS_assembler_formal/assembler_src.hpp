@@ -63,12 +63,12 @@ string intTo16BitBinarySigned(const string & str) {
     return result;
 }
 
-string intTo16BitBinaryUnsigned(const string & str){
-    unsigned decimal = stoi(str, nullptr, 0);
-    // unsigned to 16-bit unsigned binary string
-    string result = bitset<16>(decimal).to_string();
-    return result;
-}
+//string intTo16BitBinaryUnsigned(const string & str){
+//    unsigned decimal = stoi(str, nullptr, 0);
+//    // unsigned to 16-bit unsigned binary string
+//    string result = bitset<16>(decimal).to_string();
+//    return result;
+//}
 
 string shamtStrToBinary(const string & str){ // I am not sure how to deal with shamt
     int decimal = stoi(str, nullptr, 0);
@@ -162,7 +162,7 @@ string addiu_str2binary(string rt, string rs, string imm){
     string op = "001001";
     rs = registerMap.find(rs)->second;
     rt = registerMap.find(rt)->second;
-    imm = intTo16BitBinaryUnsigned(imm);
+    imm = intTo16BitBinarySigned(imm);
     string result = op + rs + rt + imm;
     return result;
 }
@@ -343,7 +343,7 @@ string ori_str2binary(string rt, string rs, string imm){
     string op = "001101";
     rs = registerMap.find(rs)->second;
     rt = registerMap.find(rt)->second;
-    imm = intTo16BitBinaryUnsigned(imm); // zero-extended imm
+    imm = intTo16BitBinarySigned(imm); // zero-extended imm
     string result = op + rs + rt + imm;
     return result;
 }
@@ -465,7 +465,7 @@ string xori_str2binary(string rt, string rs, string imm){
     string op = "001110";
     rs = registerMap.find(rs)->second;
     rt = registerMap.find(rt)->second;
-    imm = intTo16BitBinaryUnsigned(imm); // zero-extended imm
+    imm = intTo16BitBinarySigned(imm); // zero-extended imm
     string result = op + rs + rt + imm;
     return result;
 }
@@ -475,7 +475,7 @@ string lui_str2binary(string rt, string imm){
     string op = "001111";
     string rs = "00000";
     rt = registerMap.find(rt)->second;
-    imm = intTo16BitBinaryUnsigned(imm);
+    imm = intTo16BitBinarySigned(imm);
     string result = op + rs + rt + imm;
     return result;
 }

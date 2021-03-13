@@ -103,12 +103,12 @@ void startSimulator(const vector<string> instructionsBinary){
 
 
     // Start simulating
-    uint32_t * PC = textSegmentStart;
+    uint32_t * PC_realAddr = textSegmentStart;
     int protection = 0;
     while (protection < 11){
-        simulateToExecute(PC, str2SimulatedRegister);
+        simulateToExecute(PC_realAddr, str2SimulatedRegister);
 
-        PC++;
+        // PC = PC + 4 is calculated inside `simulateToExecute()`
         protection++;
     }
     // debug
