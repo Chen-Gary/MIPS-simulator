@@ -54,7 +54,7 @@ int main() {
 
 
     // start simulator
-    startSimulator(instructionsBinary);
+    startSimulator(instructionsBinary, rawDataSegment);
 
 
 //    // do other things

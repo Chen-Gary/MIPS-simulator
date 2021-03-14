@@ -174,13 +174,13 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg){
     uint32_t v0_value = *v0_reg;
 
     switch (v0_value) {
-        case 1: // print_int
+        case 1: // print_int // change IO
             printf("%d", *a0_reg);
             break;
         case 4:
             // print_string
             break;
-        case 5: // read_int
+        case 5: // read_int // change IO
             int input;
             cin >> input;
             *v0_reg = input;

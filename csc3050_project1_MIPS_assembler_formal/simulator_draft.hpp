@@ -9,7 +9,55 @@
 using namespace std;
 
 
-void startSimulator(const vector<string> instructionsBinary){
+// Put the data in .data segment of MIPS file piece by piece in the static data segment.
+// The basic syntax of raw data is: <name>: .<data_type> <value>
+// e.g. str1: .asciiz "hello world!\n"
+// Since `<name>:` is not used in this simulator, we simply ignore this part
+// The data type supported: `ascii`, `asciiz`, `word`, `byte`, `half`
+void placeStaticDataToMemory(const vector<string> & rawDataSegment){
+    // go through every line of raw data
+    for (string line : rawDataSegment){
+
+        // find and remove comment in the line
+        size_t posComment = line.find_first_of('#');
+        if (posComment != string::npos) {               // comment found
+            line = line.substr(0, posComment);     // remove the comment
+        }
+
+        // identify which data type it is
+        size_t indexOfDot = line.find_first_of('.');
+
+        // if we do not find `.`, then we assume this line is empty
+        if (indexOfDot == string::npos)
+            continue;
+
+        if (line[indexOfDot+1] == 'a') {                // `ascii` or `asciiz`
+            if (line.substr(indexOfDot+1, 6) == "asciiz") { // `asciiz` (2)
+                cout << "asciiz!!" << endl;
+            } else if (line.substr(indexOfDot+1, 5) == "ascii") { // `ascii` (1)
+                cout << "ascii!!" << endl;
+            } else {
+                cout << "Unrecognized data type in `placeStaticDataToMemory` --- `.a`" << endl;
+                throw;
+            }
+        }
+        else if (line[indexOfDot+1] == 'w') {           // `word` (3)
+            cout << "word!!" << endl;
+        }
+        else if (line[indexOfDot+1] == 'b') {           // `byte` (4)
+            cout << "byte!!" << endl;
+        }
+        else if (line[indexOfDot+1] == 'h') {           // `half` (5)
+            cout << "half!!" << endl;
+        } else {
+            cout << "Unrecognized data type in `placeStaticDataToMemory`" << endl;
+            throw;
+        }
+    }
+}
+
+
+void startSimulator(const vector<string> & instructionsBinary, const vector<string> & rawDataSegment){
 
     // Dynamically allocate 6MB to simulate memory (RAM)
     uint8_t * memoryStart = new uint8_t [6 * 1024 * 1024];          // fake address 0x400000
@@ -90,7 +138,7 @@ void startSimulator(const vector<string> instructionsBinary){
 
 
     // Put the data in .data segment of MIPS file piece by piece in the static data segment.
-    // ...
+    placeStaticDataToMemory(rawDataSegment);
 
 
     // Put the assembled machine code in the .text segment of the simulated memory
@@ -106,6 +154,7 @@ void startSimulator(const vector<string> instructionsBinary){
     uint32_t * PC_realAddr = textSegmentStart;
     int protection = 0;
     while (protection < 11){
+    //while (true){
         simulateToExecute(PC_realAddr, str2SimulatedRegister);
 
         // PC = PC + 4 is calculated inside `simulateToExecute()`
