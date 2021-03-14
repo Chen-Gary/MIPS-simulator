@@ -8,19 +8,45 @@
 #include <string>
 using namespace std;
 
+// tokenize input str, and store the tokens in a vector
+void tokenizeLine_forDataSegment(const string & str, vector<string> * tokens) {
+    size_t prev=0, pos;
+    // delimiters: space, comma, tab
+    while ((pos = str.find_first_of(" ,\t", prev)) != string::npos) {
+        if (pos > prev)
+            tokens->push_back(str.substr(prev, pos-prev));
+        prev = pos + 1;
+    }
+    if (prev < str.length())
+        tokens->push_back(str.substr(prev, string::npos));
+}
+
+
 char checkEscapeCharacter(size_t & i, char nextChar){
     i++;
     switch (nextChar) {
+        case 'a':
+            return '\a';
+        case 'b':
+            return '\b';
+        case 'f':
+            return '\f';
         case 'n':
             return '\n';
+        case 'r':
+            return '\r';
         case 't':
             return '\t';
+        case 'v':
+            return '\v';
         case '\\':
             return '\\';
         case '\'':
             return '\'';
         case '\"':
             return '\"';
+        case '\?':
+            return '\?';
         case '0':
             return '\0';
         default:         // it is not a escape character
@@ -63,6 +89,121 @@ uint8_t* asciiz_toMemory(const string & line, uint8_t* addrCurrent){
     return addrCurrent;
 }
 
+// The only difference between `asciiz_toMemory` and `ascii_toMemory` is that
+// there is no extra `valueChar.push_back('\0');` in `ascii_toMemory`
+uint8_t* ascii_toMemory(const string & line, uint8_t* addrCurrent){
+    size_t indexOpenQuotationMark = line.find_first_of('"');
+    size_t indexCloseQuotationMark = line.find_last_of('"');
+
+    string valueStr = line.substr(indexOpenQuotationMark+1, indexCloseQuotationMark - indexOpenQuotationMark - 1);
+
+    vector<char> valueChar;
+    for (size_t i=0; i<valueStr.length(); i++){
+        if (valueStr[i] == '\\' && i+1 < valueStr.length()){ // check escape character
+            char nextChar = valueStr[i+1];
+            valueChar.push_back( checkEscapeCharacter(i, nextChar) );
+        } else {
+            valueChar.push_back(valueStr[i]);
+        }
+    }
+    // now `valueChar` is ready
+
+    // place char in `valueChar` to memory
+    char* addr = (char*) addrCurrent;
+    for (char ch : valueChar){
+        *addr = ch;
+        addr++;
+    }
+
+    // valueChar.size() --> the actual bytes we used
+    // we need to extend it to the next multiple of 4
+    size_t offset = (valueChar.size() + 3) & ~0x03; // next multiple of 4
+    addrCurrent = addrCurrent + offset;
+    return addrCurrent;
+}
+
+uint8_t* word_toMemory(const string & line, uint8_t* addrCurrent){
+    size_t indexOfDot = line.find_first_of('.');
+    string valueStr = line.substr(indexOfDot+5);
+
+    vector<string> tokens;
+    tokenizeLine_forDataSegment(valueStr, &tokens);
+
+    vector<uint32_t> value;
+    for (string token : tokens){
+        uint32_t num = stoi(token, nullptr, 0);
+        value.push_back(num);
+    }
+    // now `value` is ready
+
+    // place uint32_t in `value` to memory
+    uint32_t* addr = (uint32_t*) addrCurrent;
+    for (uint32_t num : value){
+        *addr = num;
+        addr++;
+    }
+
+    size_t offset = value.size() * 4;  // value.size() --> # of words (# of 4-bytes)
+    addrCurrent = addrCurrent + offset;
+
+    return addrCurrent;
+}
+
+
+uint8_t* byte_toMemory(const string & line, uint8_t* addrCurrent){
+    size_t indexOfDot = line.find_first_of('.');
+    string valueStr = line.substr(indexOfDot+5);
+
+    vector<string> tokens;
+    tokenizeLine_forDataSegment(valueStr, &tokens);
+
+    vector<uint8_t> value;
+    for (string token : tokens){
+        uint8_t num = stoi(token, nullptr, 0);
+        value.push_back(num);
+    }
+    // now `value` is ready
+
+    // place uint8_t in `value` to memory
+    uint8_t* addr = addrCurrent;
+    for (uint8_t num : value){
+        *addr = num;
+        addr++;
+    }
+
+    size_t offset = (value.size() + 3) & ~0x03; // value.size() --> # of bytes ==> find next multiple of 4
+    addrCurrent = addrCurrent + offset;
+
+    return addrCurrent;
+}
+
+
+uint8_t* half_toMemory(const string & line, uint8_t* addrCurrent){
+    size_t indexOfDot = line.find_first_of('.');
+    string valueStr = line.substr(indexOfDot+5);
+
+    vector<string> tokens;
+    tokenizeLine_forDataSegment(valueStr, &tokens);
+
+    vector<uint16_t> value;
+    for (string token : tokens){
+        uint16_t num = stoi(token, nullptr, 0);
+        value.push_back(num);
+    }
+    // now `value` is ready
+
+    // place uint16_t in `value` to memory
+    uint16_t* addr = (uint16_t*) addrCurrent;
+    for (uint16_t num : value){
+        *addr = num;
+        addr++;
+    }
+
+    size_t offset = (value.size()*2 + 3) & ~0x03; // value.size() --> # of 2-bytes ==> find next multiple of 4
+    addrCurrent = addrCurrent + offset;
+
+    return addrCurrent;
+}
 
 
 // Put the data in .data segment of MIPS file piece by piece in the static data segment.
@@ -94,20 +235,20 @@ uint8_t* placeStaticDataToMemory(const vector<string> & rawDataSegment, uint8_t 
             if (line.substr(indexOfDot+1, 6) == "asciiz") { // `asciiz` (2)
                 staticDataSegmentCurrent = asciiz_toMemory(line, staticDataSegmentCurrent);
             } else if (line.substr(indexOfDot+1, 5) == "ascii") { // `ascii` (1)
-                cout << "ascii!!" << endl;
+                staticDataSegmentCurrent = ascii_toMemory(line, staticDataSegmentCurrent);
             } else {
                 cout << "Unrecognized data type in `placeStaticDataToMemory` --- `.a`" << endl;
                 throw;
             }
         }
         else if (line[indexOfDot+1] == 'w') {           // `word` (3)
-            cout << "word!!" << endl;
+            staticDataSegmentCurrent = word_toMemory(line, staticDataSegmentCurrent);
         }
         else if (line[indexOfDot+1] == 'b') {           // `byte` (4)
-            cout << "byte!!" << endl;
+            staticDataSegmentCurrent = byte_toMemory(line, staticDataSegmentCurrent);
         }
         else if (line[indexOfDot+1] == 'h') {           // `half` (5)
-            cout << "half!!" << endl;
+            staticDataSegmentCurrent = half_toMemory(line, staticDataSegmentCurrent);
         } else {
             cout << "Unrecognized data type in `placeStaticDataToMemory`" << endl;
             throw;
@@ -118,13 +259,13 @@ uint8_t* placeStaticDataToMemory(const vector<string> & rawDataSegment, uint8_t 
     // debug
     printf("%x\n", staticDataSegmentStart);
     printf("%x\n", staticDataSegmentCurrent);
-//    //debug `asciiz_toMemory`
-//    cout << "debug `asciiz_toMemory`" << endl;
-//    char* addr = (char*) staticDataSegmentStart;
-//    for (int i=0; i<20; i++){
-//        cout << *addr;
-//        addr++;
-//    }
+    //debug
+    cout << "debug: half_toMemory" << endl;
+    uint16_t * addr = (uint16_t*) staticDataSegmentStart;
+    for (int i=0; i<3; i++){
+        cout << *addr << endl;
+        addr++;
+    }
 
 
 
