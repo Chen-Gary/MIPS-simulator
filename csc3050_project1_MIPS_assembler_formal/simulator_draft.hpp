@@ -8,13 +8,72 @@
 #include <string>
 using namespace std;
 
+char checkEscapeCharacter(size_t & i, char nextChar){
+    i++;
+    switch (nextChar) {
+        case 'n':
+            return '\n';
+        case 't':
+            return '\t';
+        case '\\':
+            return '\\';
+        case '\'':
+            return '\'';
+        case '\"':
+            return '\"';
+        case '0':
+            return '\0';
+        default:         // it is not a escape character
+            i--;
+            return '\\';
+    }
+}
+
+// The following functions are used in `placeStaticDataToMemory()`
+// return updated `staticDataSegmentCurrent`
+uint8_t* asciiz_toMemory(const string & line, uint8_t* addrCurrent){
+    size_t indexOpenQuotationMark = line.find_first_of('"');
+    size_t indexCloseQuotationMark = line.find_last_of('"');
+
+    string valueStr = line.substr(indexOpenQuotationMark+1, indexCloseQuotationMark - indexOpenQuotationMark - 1);
+
+    vector<char> valueChar;
+    for (size_t i=0; i<valueStr.length(); i++){
+        if (valueStr[i] == '\\' && i+1 < valueStr.length()){ // check escape character
+            char nextChar = valueStr[i+1];
+            valueChar.push_back( checkEscapeCharacter(i, nextChar) );
+        } else {
+            valueChar.push_back(valueStr[i]);
+        }
+    }
+    valueChar.push_back('\0'); // since it is asciiz type
+    // now `valueChar` is ready
+
+    // place char in `valueChar` to memory
+    char* addr = (char*) addrCurrent;
+    for (char ch : valueChar){
+        *addr = ch;
+        addr++;
+    }
+
+    // valueChar.size() --> the actual bytes we used
+    // we need to extend it to the next multiple of 4
+    size_t offset = (valueChar.size() + 3) & ~0x03; // next multiple of 4
+    addrCurrent = addrCurrent + offset;
+    return addrCurrent;
+}
+
+
 
 // Put the data in .data segment of MIPS file piece by piece in the static data segment.
 // The basic syntax of raw data is: <name>: .<data_type> <value>
 // e.g. str1: .asciiz "hello world!\n"
 // Since `<name>:` is not used in this simulator, we simply ignore this part
 // The data type supported: `ascii`, `asciiz`, `word`, `byte`, `half`
-void placeStaticDataToMemory(const vector<string> & rawDataSegment){
+// return: the end of static data section (uint8_t*)
+uint8_t* placeStaticDataToMemory(const vector<string> & rawDataSegment, uint8_t * staticDataSegmentStart){
+    uint8_t * staticDataSegmentCurrent = staticDataSegmentStart;
+
     // go through every line of raw data
     for (string line : rawDataSegment){
 
@@ -33,7 +92,7 @@ void placeStaticDataToMemory(const vector<string> & rawDataSegment){
 
         if (line[indexOfDot+1] == 'a') {                // `ascii` or `asciiz`
             if (line.substr(indexOfDot+1, 6) == "asciiz") { // `asciiz` (2)
-                cout << "asciiz!!" << endl;
+                staticDataSegmentCurrent = asciiz_toMemory(line, staticDataSegmentCurrent);
             } else if (line.substr(indexOfDot+1, 5) == "ascii") { // `ascii` (1)
                 cout << "ascii!!" << endl;
             } else {
@@ -54,6 +113,23 @@ void placeStaticDataToMemory(const vector<string> & rawDataSegment){
             throw;
         }
     }
+
+
+    // debug
+    printf("%x\n", staticDataSegmentStart);
+    printf("%x\n", staticDataSegmentCurrent);
+//    //debug `asciiz_toMemory`
+//    cout << "debug `asciiz_toMemory`" << endl;
+//    char* addr = (char*) staticDataSegmentStart;
+//    for (int i=0; i<20; i++){
+//        cout << *addr;
+//        addr++;
+//    }
+
+
+
+
+    return staticDataSegmentCurrent;
 }
 
 
@@ -138,7 +214,7 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
 
 
     // Put the data in .data segment of MIPS file piece by piece in the static data segment.
-    placeStaticDataToMemory(rawDataSegment);
+    dynamicDataSegmentStart = placeStaticDataToMemory(rawDataSegment, staticDataSegmentStart);
 
 
     // Put the assembled machine code in the .text segment of the simulated memory

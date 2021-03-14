@@ -47,17 +47,16 @@ int main() {
     // now the `instructionsBinary` is ready
 
 
-    //debug
-    cout << "Assembler result: " << endl;
-    for (const string & machineCode : instructionsBinary)
-        cout << machineCode << endl;
+//    //debug
+//    cout << "Assembler result: " << endl;
+//    for (const string & machineCode : instructionsBinary)
+//        cout << machineCode << endl;
 
 
     // start simulator
     startSimulator(instructionsBinary, rawDataSegment);
 
 
-//    // do other things
 //    // debug
 //    cout << "rawDataSegment: " << endl;
 //    for (const string & oneline : rawDataSegment)
@@ -65,7 +64,4 @@ int main() {
 //    cout << "rawTextSegment: " << endl;
 //    for (const string & oneline : rawTextSegment)
 //        cout << oneline << endl;
-//    cout << "Assembler result: " << endl;
-//    for (const string & machineCode : instructionsBinary)
-//        cout << machineCode << endl;
 }
