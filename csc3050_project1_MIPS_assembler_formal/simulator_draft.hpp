@@ -310,10 +310,13 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
     uint32_t * t9_reg = new uint32_t {0};
     uint32_t * k0_reg = new uint32_t {0};
     uint32_t * k1_reg = new uint32_t {0};
-    uint32_t * gp_reg = new uint32_t {0};//???
+    uint32_t * gp_reg = new uint32_t {0x500000};
     uint32_t * sp_reg = new uint32_t {10485760};// 10485760=0xa00000; "For example, the stack pointer register, $sp, should always store the current stack top. You should initialize it with a value of 1000000_hex."
     uint32_t * fp_reg = new uint32_t {0};//???
     uint32_t * ra_reg = new uint32_t {0};
+    // two special registers $hi, $lo
+    uint32_t * hi_reg = new uint32_t {0};
+    uint32_t * lo_reg = new uint32_t {0};
 
     // map from binary_string_addr to register (which is uint32_t*)
     const map<string, uint32_t*> str2SimulatedRegister = {
@@ -349,6 +352,8 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
             {"11101", sp_reg},
             {"11110", fp_reg},
             {"11111", ra_reg},
+            {"hi_reg", hi_reg},
+            {"lo_reg", lo_reg},
     };
 
 
@@ -417,4 +422,7 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
     delete sp_reg;
     delete fp_reg;
     delete ra_reg;
+
+    delete hi_reg;
+    delete lo_reg;
 }

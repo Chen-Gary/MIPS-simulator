@@ -53,8 +53,14 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
     uint32_t* v0_reg = str2SimulatedRegister.find("00010")->second;
     uint32_t* a0_reg = str2SimulatedRegister.find("00100")->second;
 
+    uint32_t* hi_reg = str2SimulatedRegister.find("hi_reg")->second;
+    uint32_t* lo_reg = str2SimulatedRegister.find("lo_reg")->second;
+
+    // get `shamt`
+    string shamt_str = instructionStr.substr(21, 5);
+    uint32_t shamt = bitset<5>(shamt_str).to_ulong();      // regard shamt as a 5-bit unsigned number
+
     // useless codes here
-    //string shamt_str = instructionStr.substr(21, 5);
     //string imm_str = instructionStr.substr(16, 16);
     //string addr = instructionStr.substr(6, 26);     // addr_str
 
@@ -75,97 +81,97 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         addiu_toExecute(rs, rt, imm_signExtended);
     // 5.and
     else if (op == "000000" && funct == "100100")
-        printf("hello");
+        and_toExecute(rs, rt, rd);
     // 6. andi
     else if (op == "001100")
-        printf("");
+        andi_toExecute(rs, rt, imm_zeroExtended);
     // 7. clo
     else if (op == "011100" && funct == "100001")
-        printf("");
+        clo_toExecute(rs, rd);
     // 8. clz
     else if (op == "011100" && funct == "100000")
-        printf("");
+        clz_toExecute(rs, rd);
     // 9. div
     else if (op == "000000" && funct == "011010")
-        printf("");
+        div_toExecute(rs, rt, hi_reg, lo_reg);
     // 10. divu
     else if (op == "000000" && funct == "011011")
-        printf("");
+        divu_toExecute(rs, rt, hi_reg, lo_reg);
     // 11. mult
     else if (op == "000000" && funct == "011000")
-        printf("");
+        mult_toExecute(rs, rt, hi_reg, lo_reg);
     // 12. multu
     else if (op == "000000" && funct == "011001")
-        printf("");
+        multu_toExecute(rs, rt, hi_reg, lo_reg);
     // 13. mul
     else if (op == "011100" && funct == "000010")
-        printf("");
+        mul_toExecute(rs, rt, rd);
     // 14. madd
     else if (op == "011100" && funct == "000000")
-        printf("");
+        madd_toExecute(rs, rt, hi_reg, lo_reg);
     // 15. msub
     else if (op == "011100" && funct == "000100")
-        printf("");
+        msub_toExecute(rs, rt, hi_reg, lo_reg);
     // 16. maddu
     else if (op == "011100" && funct == "000001")
-        printf("");
+        maddu_toExecute(rs, rt, hi_reg, lo_reg);
     // 17.msubu
     else if (op == "011100" && funct == "000101")
-        printf("");
+        msubu_toExecute(rs, rt, hi_reg, lo_reg);
     // 18.nor
     else if (op == "000000" && funct == "100111")
-        printf("");
+        nor_toExecute(rs, rt, rd);
     // 19.or
     else if (op == "000000" && funct == "100101")
-        printf("");
+        or_toExecute(rs, rt, rd);
     // 20.ori
     else if (op == "001101")
-        printf("");
+        ori_toExecute(rs, rt, imm_zeroExtended);
     // 21.sll
     else if (op == "000000" && funct == "000000")
-        printf("");
+        sll_toExecute(rt, rd, shamt);
     // 22.sllv
     else if (op == "000000" && funct == "000100")
-        printf("");
+        sllv_toExecute(rs, rt, rd);
     // 23.sra
     else if (op == "000000" && funct == "000011")
-        printf("");
+        sra_toExecute(rt, rd, shamt);
     // 24.srav
     else if (op == "000000" && funct == "000111")
-        printf("");
+        srav_toExecute(rs, rt, rd);
     // 25.srl
     else if (op == "000000" && funct == "000010")
-        printf("");
+        srl_toExecute(rt, rd, shamt);
     // 26.srlv
     else if (op == "000000" && funct == "000110")
-        printf("");
+        srlv_toExecute(rs, rt, rd);
     // 27.sub
     else if (op == "000000" && funct == "100010")
-        printf("");
+        sub_toExecute(rs, rt, rd);
     // 28.subu
     else if (op == "000000" && funct == "100011")
-        printf("");
+        subu_toExecute(rs, rt, rd);
     // 29.xor
     else if (op == "000000" && funct == "100110")
-        printf("");
+        xor_toExecute(rs, rt, rd);
     // 30.xori
     else if (op == "001110")
-        printf("");
+        xori_toExecute(rs, rt, imm_zeroExtended);
     // 31.lui
     else if (op == "001111")
-        printf("");
+        lui_toExecute(rt, imm_zeroExtended);
     // 32.slt
     else if (op == "000000" && funct == "101010")
-        printf("");
+        slt_toExecute(rs, rt, rd);
     // 33.sltu
     else if (op == "000000" && funct == "101011")
-        printf("");
+        sltu_toExecute(rs, rt, rd);
     // 34.slti
     else if (op == "001010")
-        printf("");
+        slti_toExecute(rs, rt, imm_signExtended);
     // 35.sltiu
     else if (op == "001011")
-        printf("");
+        sltiu_toExecute(rs, rt, imm_signExtended);
     // 36.beq
     else if (op == "000100")
         printf("");
