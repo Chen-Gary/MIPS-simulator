@@ -256,18 +256,16 @@ uint8_t* placeStaticDataToMemory(const vector<string> & rawDataSegment, uint8_t 
     }
 
 
-    // debug
-    printf("%x\n", staticDataSegmentStart);
-    printf("%x\n", staticDataSegmentCurrent);
-    //debug
-    cout << "debug: half_toMemory" << endl;
-    uint16_t * addr = (uint16_t*) staticDataSegmentStart;
-    for (int i=0; i<3; i++){
-        cout << *addr << endl;
-        addr++;
-    }
-
-
+//    // debug
+//    printf("%x\n", staticDataSegmentStart);
+//    printf("%x\n", staticDataSegmentCurrent);
+//    //debug
+//    cout << "debug: half_toMemory" << endl;
+//    uint16_t * addr = (uint16_t*) staticDataSegmentStart;
+//    for (int i=0; i<3; i++){
+//        cout << *addr << endl;
+//        addr++;
+//    }
 
 
     return staticDataSegmentCurrent;
@@ -370,7 +368,8 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
     // Start simulating
     uint32_t * PC_realAddr = textSegmentStart;
     int protection = 0;
-    while (protection < 11){
+    const int PROTECT_RANGE = 11;
+    while (protection < PROTECT_RANGE){
     //while (true){
         simulateToExecute(PC_realAddr, str2SimulatedRegister);
 
@@ -378,7 +377,7 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
         protection++;
     }
     // debug
-    if (protection >= 11)
+    if (protection >= PROTECT_RANGE)
         cout << "protection exceed!!!" << endl;
 
 
