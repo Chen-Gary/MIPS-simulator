@@ -72,9 +72,13 @@ uint32_t imm_zeroExtended
 uint32_t* v0_reg
 uint32_t* a0_reg
 
+uint32_t* ra_reg
+    
 uint32_t* hi_reg
 uint32_t* lo_reg
 
 uint32_t shamt
+    
+uint32_t* textSegmentStart
 ```
 

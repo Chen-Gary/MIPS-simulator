@@ -259,13 +259,16 @@ void bgez_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAd
         PC_realAddr += imm_signExtended;
 }
 // 38.bgezal
-void bgezal_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr){
+void bgezal_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr, uint32_t* ra_reg, const uint32_t* textSegmentStart){
     int32_t rs_signed = *rs;
     if (rs_signed >= 0)
         PC_realAddr += imm_signExtended;
     // al: and link
-    // Save the address of the next instruction in register 31
-    // ... DO IT!!!!
+    // Save the address of the next instruction in register 31 ,i.e. ra_reg
+    // PC_realAddr - textSegmentStart = PC_fake - 0x400000 (in bytes)
+    // *ra_reg = PC_fake!!
+    uint32_t offsetIn4Byte = PC_realAddr - textSegmentStart;
+    *ra_reg = offsetIn4Byte * 4 + 0x400000;
 }
 // 39.bgtz
 

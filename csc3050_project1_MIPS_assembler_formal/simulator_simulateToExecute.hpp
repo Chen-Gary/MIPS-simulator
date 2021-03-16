@@ -20,7 +20,7 @@ uint32_t zeroExtendedImm(uint32_t instruction){
 
 // Note that in this implementation we do not check which type (R, I or J) the current instruction is.
 // Instead we directly use `op` and `funct` to identify which instruction PC_realAddr currently points to
-void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & str2SimulatedRegister){
+void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & str2SimulatedRegister, const uint32_t* textSegmentStart){
     uint32_t instruction = *PC_realAddr; // fetch instruction
     PC_realAddr++; // PC = PC + 4
 
@@ -52,6 +52,8 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
     // get `v0_reg` (do this for `syscall` instruction)
     uint32_t* v0_reg = str2SimulatedRegister.find("00010")->second;
     uint32_t* a0_reg = str2SimulatedRegister.find("00100")->second;
+
+    uint32_t* ra_reg = str2SimulatedRegister.find("11111")->second;
 
     uint32_t* hi_reg = str2SimulatedRegister.find("hi_reg")->second;
     uint32_t* lo_reg = str2SimulatedRegister.find("lo_reg")->second;
@@ -174,13 +176,13 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         sltiu_toExecute(rs, rt, imm_signExtended);
     // 36.beq
     else if (op == "000100")
-        printf("");
+        beq_toExecute(rs, rt, imm_signExtended, PC_realAddr);
     // 37.bgez
     else if (op == "000001" && rt_str == "00001")
-        printf("");
+        bgez_toExecute(rs, imm_signExtended, PC_realAddr);
     // 38.bgezal
     else if (op == "000001" && rt_str == "10001")
-        printf("");
+        bgezal_toExecute(rs, imm_signExtended, PC_realAddr, ra_reg, textSegmentStart);
     // 39.bgtz
     else if (op == "000111" && rt_str == "00000")
         printf("");

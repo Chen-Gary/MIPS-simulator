@@ -376,7 +376,7 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
     const int PROTECT_RANGE = 11;
     while (protection < PROTECT_RANGE){
     //while (true){
-        simulateToExecute(PC_realAddr, str2SimulatedRegister);
+        simulateToExecute(PC_realAddr, str2SimulatedRegister, textSegmentStart);
 
         // PC = PC + 4 is calculated inside `simulateToExecute()`
         protection++;
