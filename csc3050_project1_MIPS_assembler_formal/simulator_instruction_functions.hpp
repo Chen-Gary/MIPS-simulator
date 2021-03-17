@@ -4,6 +4,22 @@
 
 const uint64_t MAKS_LOWER_32 = 0xffffffff;
 
+
+// PC_realAddr - textSegmentStart = PC_fake - 0x400000 (in bytes)
+// *ra_reg = PC_fake!!
+uint32_t addrReal2Fake(uint32_t* PC_realAddr, uint32_t* textSegmentStart){
+    uint32_t offsetIn4Byte = PC_realAddr - textSegmentStart;
+    uint32_t fakeAddr = offsetIn4Byte * 4 + 0x400000;
+    return fakeAddr;
+}
+
+uint32_t* addrFake2Real(uint32_t fakeAddr, uint32_t* textSegmentStart){
+    uint32_t offsetIn4Byte = (fakeAddr - 0x400000) >> 2;
+    uint32_t* realAddr = textSegmentStart + offsetIn4Byte;
+    return realAddr;
+}
+
+
 // 1. add
 void add_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
     *rd = *rs + *rt;
@@ -259,69 +275,218 @@ void bgez_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAd
         PC_realAddr += imm_signExtended;
 }
 // 38.bgezal
-void bgezal_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr, uint32_t* ra_reg, const uint32_t* textSegmentStart){
+void bgezal_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr, uint32_t* ra_reg, uint32_t* textSegmentStart){
+    // al: and link
+    // Save the address of the next instruction in register 31 ,i.e. ra_reg
+    *ra_reg = addrReal2Fake(PC_realAddr, textSegmentStart);
+
     int32_t rs_signed = *rs;
     if (rs_signed >= 0)
         PC_realAddr += imm_signExtended;
-    // al: and link
-    // Save the address of the next instruction in register 31 ,i.e. ra_reg
-    // PC_realAddr - textSegmentStart = PC_fake - 0x400000 (in bytes)
-    // *ra_reg = PC_fake!!
-    uint32_t offsetIn4Byte = PC_realAddr - textSegmentStart;
-    *ra_reg = offsetIn4Byte * 4 + 0x400000;
 }
 // 39.bgtz
-
+void bgtz_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr){
+    int32_t rs_signed = *rs;
+    if (rs_signed > 0)
+        PC_realAddr += imm_signExtended;
+}
 // 40.blez
-
+void blez_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr){
+    int32_t rs_signed = *rs;
+    if (rs_signed <= 0)
+        PC_realAddr += imm_signExtended;
+}
 // 41.bltzal
+void bltzal_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr, uint32_t* ra_reg, uint32_t* textSegmentStart){
+    // al
+    *ra_reg = addrReal2Fake(PC_realAddr, textSegmentStart);
 
+    int32_t rs_signed = *rs;
+    if (rs_signed < 0)
+        PC_realAddr += imm_signExtended;
+}
 // 42.bltz
-
+void bltz_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_realAddr){
+    int32_t rs_signed = *rs;
+    if (rs_signed < 0)
+        PC_realAddr += imm_signExtended;
+}
 // 43.bne
-
+void bne_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* &PC_realAddr){
+    if (*rs != *rt)
+        PC_realAddr += imm_signExtended;
+}
 // 44.j
-
+void j_toExecute(uint32_t target, uint32_t* &PC_realAddr, uint32_t* textSegmentStart){
+    uint32_t fakeAddrCurrent = addrReal2Fake(PC_realAddr, textSegmentStart);
+    uint32_t fakeAddrTarget = (fakeAddrCurrent & 0xf0000000) | (target << 2);
+    PC_realAddr = addrFake2Real(fakeAddrTarget, textSegmentStart);
+}
 // 45.jal
+void jal_toExecute(uint32_t target, uint32_t* &PC_realAddr, uint32_t* textSegmentStart, uint32_t* ra_reg){
+    uint32_t fakeAddrCurrent = addrReal2Fake(PC_realAddr, textSegmentStart);
+    uint32_t fakeAddrTarget = (fakeAddrCurrent & 0xf0000000) | (target << 2);
+    PC_realAddr = addrFake2Real(fakeAddrTarget, textSegmentStart);
 
+    // al
+    *ra_reg = fakeAddrCurrent;
+}
 // 46.jalr
+void jalr_toExecute(uint32_t* rs, uint32_t* rd, uint32_t* &PC_realAddr, uint32_t* textSegmentStart){
+    // al
+    uint32_t fakeAddrCurrent = addrReal2Fake(PC_realAddr, textSegmentStart);
+    *rd = fakeAddrCurrent;
 
+    uint32_t fakeAddrTarget = *rs;
+    PC_realAddr = addrFake2Real(fakeAddrTarget, textSegmentStart);
+}
 // 47.jr
-
+void jr_toExecute(uint32_t* rs, uint32_t* &PC_realAddr, uint32_t* textSegmentStart){
+    uint32_t fakeAddrTarget = *rs;
+    PC_realAddr = addrFake2Real(fakeAddrTarget, textSegmentStart);
+}
 // 48.teq
-
+void teq_toExecute(uint32_t* rs, uint32_t* rt){
+    if (*rs == *rt){
+        cout << "Trap exception: teq rs == rt." << endl;
+        throw;
+    }
+}
 // 49.teqi
-
+void teqi_toExecute(uint32_t* rs, int32_t imm_signExtended){
+    int32_t rs_signed = *rs;
+    if (rs_signed == imm_signExtended){
+        cout << "Trap exception: teqi rs == imm." << endl;
+        throw;
+    }
+}
 // 50.tne
-
+void tne_toExecute(uint32_t* rs, uint32_t* rt){
+    if (*rs != *rt){
+        cout << "Trap exception: tne rs != rt." << endl;
+        throw;
+    }
+}
 // 51.tnei
-
+void tnei_toExecute(uint32_t* rs, int32_t imm_signExtended){
+    int32_t rs_signed = *rs;
+    if (rs_signed != imm_signExtended){
+        cout << "Trap exception: tnei rs != imm." << endl;
+        throw;
+    }
+}
 // 52.tge
+void tge_toExecute(uint32_t* rs, uint32_t* rt){
+    int32_t rs_signed = *rs;
+    int32_t rt_signed = *rt;
 
+    if (rs_signed >= rt_signed){
+        cout << "Trap exception: tge rs >= rt." << endl;
+        throw;
+    }
+}
 // 53.tgeu
-
+void tgeu_toExecute(uint32_t* rs, uint32_t* rt){
+    if (*rs >= *rt){
+        cout << "Trap exception: tgeu rs >= rt." << endl;
+        throw;
+    }
+}
 // 54.tgei
-
+void tgei_toExecute(uint32_t* rs, int32_t imm_signExtended){
+    int32_t rs_signed = *rs;
+    if (rs_signed >= imm_signExtended){
+        cout << "Trap exception: tgei rs >= imm." << endl;
+        throw;
+    }
+}
 // 55.tgeiu
-
+void tgeiu_toExecute(uint32_t* rs, int32_t imm_signExtended){
+    if (*rs >= imm_signExtended){
+        cout << "Trap exception: tgeiu rs >= imm." << endl;
+        throw;
+    }
+}
 // 56.tlt
+void tlt_toExecute(uint32_t* rs, uint32_t* rt){
+    int32_t rs_signed = *rs;
+    int32_t rt_signed = *rt;
 
+    if (rs_signed < rt_signed){
+        cout << "Trap exception: tlt rs < rt." << endl;
+        throw;
+    }
+}
 // 57.tltu
-
+void tltu_toExecute(uint32_t* rs, uint32_t* rt){
+    if (*rs < *rt){
+        cout << "Trap exception: tltu rs < rt." << endl;
+        throw;
+    }
+}
 // 58.tlti
-
+void tlti_toExecute(uint32_t* rs, int32_t imm_signExtended){
+    int32_t rs_signed = *rs;
+    if (rs_signed < imm_signExtended){
+        cout << "Trap exception: tlti rs < imm." << endl;
+        throw;
+    }
+}
 // 59.tltiu
+void tltiu_toExecute(uint32_t* rs, int32_t imm_signExtended){
+    if (*rs < imm_signExtended){
+        cout << "Trap exception: tltiu rs < imm." << endl;
+        throw;
+    }
+}
+
+// Note that the unit of `offset` is byte!!
+// e.g. A[8] --> lw $t0, 32($s3)
+// Here 32 = 4 * 8
 
 // 60.lb
+void lb_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    int8_t* realAddrByte = (int8_t*) realAddr;
+    int32_t result = *realAddrByte; // sign-extended
+    *rt = result;
+}
 // 61.lbu
+void lbu_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    uint8_t* realAddrByte = (uint8_t*) realAddr;
+    uint32_t result = *realAddrByte; // unsign-extended
+    *rt = result;
+}
 // 62.lh
+void lh_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    int16_t* realAddrHalf = (int16_t*) realAddr;
+    int32_t result = *realAddrHalf; // sign-extended
+    *rt = result;
+}
 // 63.lhu
+void lhu_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    uint16_t* realAddrByte = (uint16_t*) realAddr;
+    uint32_t result = *realAddrByte; // unsign-extended
+    *rt = result;
+}
 // 64.lw
+void lw_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    *rt = *realAddr;
+}
 // 65.lwl
 
 // 66.lwr
@@ -333,7 +498,12 @@ void bgezal_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_real
 // 69.sh
 
 // 70.sw
+void sw_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    *realAddr = *rt;
+}
 // 71.swl
 
 // 72.swr
@@ -349,18 +519,25 @@ void bgezal_toExecute(uint32_t* rs, int32_t imm_signExtended, uint32_t* &PC_real
 // 77.mtlo
 
 // 78.syscall
-void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg){
+void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* textSegmentStart){
     uint32_t v0_value = *v0_reg;
+
+    // case 4
+    uint32_t* realAddr = addrFake2Real(*a0_reg, textSegmentStart);
+    char* ch_ptr = (char*) realAddr;
+    int input; // case 5
 
     switch (v0_value) {
         case 1: // print_int // change IO
             printf("%d", *a0_reg);
             break;
-        case 4:
-            // print_string
+        case 4: // print_string // change IO
+            while ((*ch_ptr) != '\0'){
+                printf("%c", *ch_ptr);
+                ch_ptr++;
+            }
             break;
         case 5: // read_int // change IO
-            int input;
             cin >> input;
             *v0_reg = input;
             break;

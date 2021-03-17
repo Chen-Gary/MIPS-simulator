@@ -18,9 +18,15 @@ uint32_t zeroExtendedImm(uint32_t instruction){
     return imm_zeroExtended;
 }
 
+// target in J-type
+uint32_t zeroExtendedTarget(uint32_t instruction){
+    uint32_t target = (instruction << 6) >> 6;
+    return target;
+}
+
 // Note that in this implementation we do not check which type (R, I or J) the current instruction is.
 // Instead we directly use `op` and `funct` to identify which instruction PC_realAddr currently points to
-void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & str2SimulatedRegister, const uint32_t* textSegmentStart){
+void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & str2SimulatedRegister, uint32_t* textSegmentStart){
     uint32_t instruction = *PC_realAddr; // fetch instruction
     PC_realAddr++; // PC = PC + 4
 
@@ -61,6 +67,8 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
     // get `shamt`
     string shamt_str = instructionStr.substr(21, 5);
     uint32_t shamt = bitset<5>(shamt_str).to_ulong();      // regard shamt as a 5-bit unsigned number
+    // get `target`
+    uint32_t target = zeroExtendedTarget(instruction);
 
     // useless codes here
     //string imm_str = instructionStr.substr(16, 16);
@@ -185,124 +193,124 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         bgezal_toExecute(rs, imm_signExtended, PC_realAddr, ra_reg, textSegmentStart);
     // 39.bgtz
     else if (op == "000111" && rt_str == "00000")
-        printf("");
+        bgtz_toExecute(rs, imm_signExtended, PC_realAddr);
     // 40.blez
     else if (op == "000110" && rt_str == "00000")
-        printf("");
+        blez_toExecute(rs, imm_signExtended, PC_realAddr);
     // 41.bltzal
     else if (op == "000001" && rt_str == "10000")
-        printf("");
+        bltzal_toExecute(rs, imm_signExtended, PC_realAddr, ra_reg, textSegmentStart);
     // 42.bltz
     else if (op == "000001" && rt_str == "00000")
-        printf("");
+        bltz_toExecute(rs, imm_signExtended, PC_realAddr);
     // 43.bne
     else if (op == "000101")
-        printf("");
+        bne_toExecute(rs, rt, imm_signExtended, PC_realAddr);
     // 44.j
     else if (op == "000010")
-        printf("");
+        j_toExecute(target, PC_realAddr, textSegmentStart);
     // 45.jal
     else if (op == "000011")
-        printf("");
+        jal_toExecute(target, PC_realAddr, textSegmentStart, ra_reg);
     // 46.jalr
     else if (op == "000000" && funct == "001001")
-        printf("");
+        jalr_toExecute(rs, rd, PC_realAddr, textSegmentStart);
     // 47.jr
     else if (op == "000000" && funct == "001000")
-        printf("");
+        jr_toExecute(rs, PC_realAddr, textSegmentStart);
     // 48.teq
     else if (op == "000000" && funct == "110100")
-        printf("");
+        teq_toExecute(rs, rt);
     // 49.teqi
     else if (op == "000001" && rt_str == "01100")
-        printf("");
+        teqi_toExecute(rs, imm_signExtended);
     // 50.tne
     else if (op == "000000" && funct == "110110")
-        printf("");
+        tne_toExecute(rs, rt);
     // 51.tnei
     else if (op == "000001" && rt_str == "01110")
-        printf("");
+        tnei_toExecute(rs, imm_signExtended);
     // 52.tge
     else if (op == "000000" && funct == "110000")
-        printf("");
+        tge_toExecute(rs, rt);
     // 53.tgeu
     else if (op == "000000" && funct == "110001")
-        printf("");
+        tgeu_toExecute(rs, rt);
     // 54.tgei
     else if (op == "000001" && rt_str == "01000")
-        printf("");
+        tgei_toExecute(rs, imm_signExtended);
     // 55.tgeiu
     else if (op == "000001" && rt_str == "01001")
-        printf("");
+        tgeiu_toExecute(rs, imm_signExtended);
     // 56.tlt
     else if (op == "000000" && funct == "110010")
-        printf("");
+        tlt_toExecute(rs, rt);
     // 57.tltu
     else if (op == "000000" && funct == "110011")
-        printf("");
+        tltu_toExecute(rs, rt);
     // 58.tlti
     else if (op == "000001" && rt_str == "01010")
-        printf("");
+        tlti_toExecute(rs, imm_signExtended);
     // 59.tltiu
     else if (op == "000001" && rt_str == "01011")
-        printf("");
+        tltiu_toExecute(rs, imm_signExtended);
     // 60.lb
     else if (op == "100000")
-        printf("");
+        lb_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 61.lbu
     else if (op == "100100")
-        printf("");
+        lbu_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 62.lh
     else if (op == "100001")
-        printf("");
+        lh_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 63.lhu
     else if (op == "100101")
-        printf("");
+        lhu_toExecute(rs, rt ,imm_signExtended, textSegmentStart);
     // 64.lw
     else if (op == "100011")
-        printf("");
+        lw_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 65.lwl
     else if (op == "100010")
-        printf("");
+        printf("to be implemented\n");
     // 66.lwr
     else if (op == "100110")
-        printf("");
+        printf("to be implemented\n");
     // 67.ll
     else if (op == "110000")
-        printf("");
+        printf("to be implemented\n");
     // 68.sb
     else if (op == "101000")
-        printf("");
+        printf("to be implemented\n");
     // 69.sh
     else if (op == "101001")
-        printf("");
+        printf("to be implemented\n");
     // 70.sw
     else if (op == "101011")
-        printf("");
+        sw_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 71.swl
     else if (op == "101010")
-        printf("");
+        printf("to be implemented\n");
     // 72.swr
     else if (op == "101110")
-        printf("");
+        printf("to be implemented\n");
     // 73.sc
     else if (op == "111000")
-        printf("");
+        printf("to be implemented\n");
     // 74.mfhi
     else if (op == "000000" && funct == "010000")
-        printf("");
+        printf("to be implemented\n");
     // 75.mflo
     else if (op == "000000" && funct == "010010")
-        printf("");
+        printf("to be implemented\n");
     // 76.mthi
     else if (op == "000000" && funct == "010001")
-        printf("");
+        printf("to be implemented\n");
     // 77.mtlo
     else if (op == "000000" && funct == "010011")
-        printf("");
+        printf("to be implemented\n");
     // 78.syscall
     else if (op == "000000" && funct == "001100")
-        syscall_toExecute(v0_reg, a0_reg);
+        syscall_toExecute(v0_reg, a0_reg, textSegmentStart);
     else {
         cout << "Unrecognized instruction in `simulateToExecute()`" << endl;
         throw;

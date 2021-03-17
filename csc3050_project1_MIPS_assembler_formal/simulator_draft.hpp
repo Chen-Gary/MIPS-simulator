@@ -282,6 +282,7 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
     uint8_t * stackSegmentStart = memoryStart + 6 * 1024 * 1024;    // fake address 0xa00000
 
     // Simulate registers (the address store in these fake registers are all fake address, instead of real address)
+    // The fake address is of type uint32_t, while real address is uint32_t*
     uint32_t * zero_reg = new uint32_t {0};
     uint32_t * at_reg = new uint32_t {0};
     uint32_t * v0_reg = new uint32_t {0};
@@ -372,18 +373,23 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
 
     // Start simulating
     uint32_t * PC_realAddr = textSegmentStart;
-    int protection = 0;
-    const int PROTECT_RANGE = 11;
-    while (protection < PROTECT_RANGE){
-    //while (true){
-        simulateToExecute(PC_realAddr, str2SimulatedRegister, textSegmentStart);
+//    int protection = 0;
+//    const int PROTECT_RANGE = 11;
+//    while (protection < PROTECT_RANGE){
+//    //while (true){
+//        simulateToExecute(PC_realAddr, str2SimulatedRegister, textSegmentStart);
+//
+//        // PC = PC + 4 is calculated inside `simulateToExecute()`
+//        protection++;
+//    }
 
-        // PC = PC + 4 is calculated inside `simulateToExecute()`
-        protection++;
+    while (true){
+        simulateToExecute(PC_realAddr, str2SimulatedRegister, textSegmentStart);
     }
-    // debug
-    if (protection >= PROTECT_RANGE)
-        cout << "protection exceed!!!" << endl;
+
+//    // debug
+//    if (protection >= PROTECT_RANGE)
+//        cout << "protection exceed!!!" << endl;
 
 
 
