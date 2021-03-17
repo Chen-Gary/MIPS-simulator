@@ -1,17 +1,3 @@
-`shamt` ---- signed or unsigned?????
-
-
-
-$gp
-
-
-
-$sp
-
-```
-"For example, the stack pointer register, $sp, should always store the current stack top. You should initialize it with a value of 1000000_hex."
-```
-
 $fp
 
 
@@ -45,14 +31,6 @@ sub
 
 delete `protection` in `simulator_draft.hpp`
 
----
-
-// i do not know
-
-```
-
-```
-
 
 
 ---
@@ -83,7 +61,17 @@ uint32_t target
 uint32_t* textSegmentStart
 ```
 
+---
 
+to implement
 
+```
+lwl
+lwr
 
+swl
+swr
+
+syscall
+```
 

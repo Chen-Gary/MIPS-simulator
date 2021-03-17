@@ -2,7 +2,7 @@
  * This file contains the simulation functions for each instruction.
  */
 
-const uint64_t MAKS_LOWER_32 = 0xffffffff;
+const uint64_t MAKS_LOWER_32 = 0x00000000ffffffff;
 
 
 // PC_realAddr - textSegmentStart = PC_fake - 0x400000 (in bytes)
@@ -492,11 +492,29 @@ void lw_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t
 // 66.lwr
 
 // 67.ll
+// Here `ll` is regarded as `lw`.
+void ll_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    *rt = *realAddr;
+}
 // 68.sb
+void sb_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    uint8_t* realAddrByte = (uint8_t*) realAddr;
+    *realAddrByte = (uint8_t) ((*rt) & 0x000000ff);
+}
 // 69.sh
+void sh_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    uint16_t* realAddrHalf = (uint16_t*) realAddr;
+    *realAddrHalf = (uint16_t) ((*rt) & 0x0000ffff);
+}
 // 70.sw
 void sw_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
     uint32_t fakeAddr = (*rs) + imm_signExtended;
@@ -509,15 +527,29 @@ void sw_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t
 // 72.swr
 
 // 73.sc
+// Here `sc` is regarded as `sw`.
+void sc_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    uint32_t* realAddr = addrFake2Real(fakeAddr, textSegmentStart);
 
+    *realAddr = *rt;
+}
 // 74.mfhi
-
+void mfhi_toExecute(uint32_t* rd, uint32_t* hi_reg){
+    *rd = *hi_reg;
+}
 // 75.mflo
-
+void mflo_toExecute(uint32_t* rd, uint32_t* lo_reg){
+    *rd = *lo_reg;
+}
 // 76.mthi
-
+void mthi_toExecute(uint32_t* rs, uint32_t* hi_reg){
+    *hi_reg = *rs;
+}
 // 77.mtlo
-
+void mtlo_toExecute(uint32_t* rs, uint32_t* lo_reg){
+    *lo_reg = *rs;
+}
 // 78.syscall
 void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* textSegmentStart){
     uint32_t v0_value = *v0_reg;

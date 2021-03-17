@@ -277,13 +277,13 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         printf("to be implemented\n");
     // 67.ll
     else if (op == "110000")
-        printf("to be implemented\n");
+        ll_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 68.sb
     else if (op == "101000")
-        printf("to be implemented\n");
+        sb_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 69.sh
     else if (op == "101001")
-        printf("to be implemented\n");
+        sh_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 70.sw
     else if (op == "101011")
         sw_toExecute(rs, rt, imm_signExtended, textSegmentStart);
@@ -295,19 +295,19 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         printf("to be implemented\n");
     // 73.sc
     else if (op == "111000")
-        printf("to be implemented\n");
+        sc_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 74.mfhi
     else if (op == "000000" && funct == "010000")
-        printf("to be implemented\n");
+        mfhi_toExecute(rd, hi_reg);
     // 75.mflo
     else if (op == "000000" && funct == "010010")
-        printf("to be implemented\n");
+        mflo_toExecute(rd, lo_reg);
     // 76.mthi
     else if (op == "000000" && funct == "010001")
-        printf("to be implemented\n");
+        mthi_toExecute(rs, hi_reg);
     // 77.mtlo
     else if (op == "000000" && funct == "010011")
-        printf("to be implemented\n");
+        mtlo_toExecute(rs, lo_reg);
     // 78.syscall
     else if (op == "000000" && funct == "001100")
         syscall_toExecute(v0_reg, a0_reg, textSegmentStart);
