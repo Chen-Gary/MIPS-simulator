@@ -78,7 +78,12 @@ uint32_t* hi_reg
 uint32_t* lo_reg
 
 uint32_t shamt
+uint32_t target
     
 uint32_t* textSegmentStart
 ```
+
+
+
+
 
