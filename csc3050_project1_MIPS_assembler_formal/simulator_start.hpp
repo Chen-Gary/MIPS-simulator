@@ -373,20 +373,20 @@ void startSimulator(const vector<string> & instructionsBinary, const vector<stri
 
     // Start simulating
     uint32_t * PC_realAddr = textSegmentStart;
+    uint8_t * dynamicDataSegmentCurrent = dynamicDataSegmentStart;
+
+    while (true){
+        simulateToExecute(PC_realAddr, str2SimulatedRegister, textSegmentStart, dynamicDataSegmentCurrent);
+    }
+
 //    int protection = 0;
 //    const int PROTECT_RANGE = 11;
 //    while (protection < PROTECT_RANGE){
-//    //while (true){
 //        simulateToExecute(PC_realAddr, str2SimulatedRegister, textSegmentStart);
 //
 //        // PC = PC + 4 is calculated inside `simulateToExecute()`
 //        protection++;
 //    }
-
-    while (true){
-        simulateToExecute(PC_realAddr, str2SimulatedRegister, textSegmentStart);
-    }
-
 //    // debug
 //    if (protection >= PROTECT_RANGE)
 //        cout << "protection exceed!!!" << endl;

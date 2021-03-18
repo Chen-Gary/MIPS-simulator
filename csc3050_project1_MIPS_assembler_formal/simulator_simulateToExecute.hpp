@@ -26,7 +26,7 @@ uint32_t zeroExtendedTarget(uint32_t instruction){
 
 // Note that in this implementation we do not check which type (R, I or J) the current instruction is.
 // Instead we directly use `op` and `funct` to identify which instruction PC_realAddr currently points to
-void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & str2SimulatedRegister, uint32_t* textSegmentStart){
+void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & str2SimulatedRegister, uint32_t* textSegmentStart, uint8_t* &dynamicDataSegmentCurrent){
     uint32_t instruction = *PC_realAddr; // fetch instruction
     PC_realAddr++; // PC = PC + 4
 
@@ -58,6 +58,8 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
     // get `v0_reg` (do this for `syscall` instruction)
     uint32_t* v0_reg = str2SimulatedRegister.find("00010")->second;
     uint32_t* a0_reg = str2SimulatedRegister.find("00100")->second;
+    uint32_t* a1_reg = str2SimulatedRegister.find("00101")->second;
+    uint32_t* a2_reg = str2SimulatedRegister.find("00110")->second;
 
     uint32_t* ra_reg = str2SimulatedRegister.find("11111")->second;
 
@@ -67,6 +69,7 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
     // get `shamt`
     string shamt_str = instructionStr.substr(21, 5);
     uint32_t shamt = bitset<5>(shamt_str).to_ulong();      // regard shamt as a 5-bit unsigned number
+
     // get `target`
     uint32_t target = zeroExtendedTarget(instruction);
 
@@ -271,10 +274,10 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         lw_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 65.lwl
     else if (op == "100010")
-        printf("to be implemented\n");
+        lwl_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 66.lwr
     else if (op == "100110")
-        printf("to be implemented\n");
+        lwr_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 67.ll
     else if (op == "110000")
         ll_toExecute(rs, rt, imm_signExtended, textSegmentStart);
@@ -289,10 +292,10 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         sw_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 71.swl
     else if (op == "101010")
-        printf("to be implemented\n");
+        swl_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 72.swr
     else if (op == "101110")
-        printf("to be implemented\n");
+        swr_toExecute(rs, rt, imm_signExtended, textSegmentStart);
     // 73.sc
     else if (op == "111000")
         sc_toExecute(rs, rt, imm_signExtended, textSegmentStart);
@@ -310,7 +313,7 @@ void simulateToExecute(uint32_t* &PC_realAddr, const map<string, uint32_t*> & st
         mtlo_toExecute(rs, lo_reg);
     // 78.syscall
     else if (op == "000000" && funct == "001100")
-        syscall_toExecute(v0_reg, a0_reg, textSegmentStart);
+        syscall_toExecute(v0_reg, a0_reg, a1_reg, a2_reg, textSegmentStart, dynamicDataSegmentCurrent);
     else {
         cout << "Unrecognized instruction in `simulateToExecute()`" << endl;
         throw;

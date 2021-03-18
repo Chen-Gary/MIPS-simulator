@@ -2,6 +2,8 @@
  * This file contains the simulation functions for each instruction.
  */
 
+#include <fcntl.h>
+
 const uint64_t MAKS_LOWER_32 = 0x00000000ffffffff;
 
 
@@ -61,7 +63,7 @@ void clo_toExecute(uint32_t* rs, uint32_t* rd){
 }
 // 8. clz
 void clz_toExecute(uint32_t* rs, uint32_t* rd){
-    // https://www.geeksforgeeks.org/number-of-leading-zeros-in-binary-representation-of-a-given-number/
+    // ref: https://www.geeksforgeeks.org/number-of-leading-zeros-in-binary-representation-of-a-given-number/
     uint32_t x = *rs;
     int total_bits = sizeof(x) * 8;
     int res = 0;
@@ -488,9 +490,30 @@ void lw_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t
     *rt = *realAddr;
 }
 // 65.lwl
+void lwl_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint8_t* destination = (uint8_t*) rt;
 
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    do {
+        uint8_t* realAddr = (uint8_t*) addrFake2Real(fakeAddr, textSegmentStart);
+        *destination = *realAddr;
+        destination++;
+        fakeAddr++;
+    } while (fakeAddr%4 != 0);
+}
 // 66.lwr
+void lwr_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint8_t* destination = (uint8_t*) rt;
+    destination += 3;
 
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    do {
+        uint8_t* realAddr = (uint8_t*) addrFake2Real(fakeAddr, textSegmentStart);
+        *destination = *realAddr;
+        destination--;
+        fakeAddr--;
+    } while ((fakeAddr+1)%4 != 0);
+}
 // 67.ll
 // Here `ll` is regarded as `lw`.
 void ll_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
@@ -523,9 +546,32 @@ void sw_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t
     *realAddr = *rt;
 }
 // 71.swl
+// I do not know
+void swl_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint8_t* source = (uint8_t*) rt;
 
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    do {
+        uint8_t* realAddr = (uint8_t*) addrFake2Real(fakeAddr, textSegmentStart);
+        *realAddr = *source;
+        source++;
+        fakeAddr++;
+    } while (fakeAddr%4 != 0);
+}
 // 72.swr
+// I do not know
+void swr_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
+    uint8_t* source = (uint8_t*) rt;
+    source += 3;
 
+    uint32_t fakeAddr = (*rs) + imm_signExtended;
+    do {
+        uint8_t* realAddr = (uint8_t*) addrFake2Real(fakeAddr, textSegmentStart);
+        *realAddr = *source;
+        source--;
+        fakeAddr--;
+    } while ((fakeAddr+1)%4 != 0);
+}
 // 73.sc
 // Here `sc` is regarded as `sw`.
 void sc_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended, uint32_t* textSegmentStart){
@@ -551,13 +597,29 @@ void mtlo_toExecute(uint32_t* rs, uint32_t* lo_reg){
     *lo_reg = *rs;
 }
 // 78.syscall
-void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* textSegmentStart){
+void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* a1_reg, uint32_t* a2_reg, uint32_t* textSegmentStart, uint8_t* &dynamicDataSegmentCurrent){
     uint32_t v0_value = *v0_reg;
 
     // case 4
     uint32_t* realAddr = addrFake2Real(*a0_reg, textSegmentStart);
     char* ch_ptr = (char*) realAddr;
-    int input; // case 5
+
+    // case 5
+    int input;
+
+    // case 8
+    uint32_t buffer_a0 = *a0_reg;
+    char* realBufferAddr_a0 = (char*) addrFake2Real(buffer_a0, textSegmentStart);
+    uint32_t length_a1 = *a1_reg;
+
+    // case 12
+    char inputChar;
+
+    //case 14, 15, 16
+    uint32_t file_descriptor = *a0_reg;
+    uint32_t buffer_a1 = *a1_reg;
+    uint8_t* realBufferAddr_a1 = (uint8_t*) addrFake2Real(buffer_a1, textSegmentStart);
+    uint32_t length_a2 = *a2_reg;
 
     switch (v0_value) {
         case 1: // print_int // change IO
@@ -573,32 +635,37 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* textSegment
             cin >> input;
             *v0_reg = input;
             break;
-        case 8:
-            // read_string
+        case 8: // read_string
+            //fgets(realBufferAddr_a0, length_a1);
             break;
-        case 9:
-            // sbrk
+        case 9: // sbrk
+            *v0_reg = addrReal2Fake( (uint32_t*) dynamicDataSegmentCurrent, textSegmentStart);
+            dynamicDataSegmentCurrent += (*a0_reg);
             break;
         case 10: // exit
             exit(EXIT_SUCCESS);
             break;
-        case 11:
-            // print_char
+        case 11: // print_char
+            printf("%c", (*a0_reg));
             break;
         case 12:
-            // read_char
+            cin >> inputChar;
+            *v0_reg = (uint8_t) inputChar;
             break;
-        case 13:
-            // open
+        case 13: // open
+            //open();
             break;
-        case 14:
-            // read
+        case 14: // read
+            read(file_descriptor, realBufferAddr_a1, length_a2);
             break;
-        case 15:
-            // write
+        case 15: // write
+            write(file_descriptor, realBufferAddr_a1, length_a2);
+//            for (uint32_t i=0; i<length_a2; i++){
+//                printf("%c", *(realBufferAddr_a1+i));
+//            }
             break;
-        case 16:
-            // close
+        case 16: // close
+            close(file_descriptor);
             break;
         case 17:
             // exit2
