@@ -676,14 +676,16 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* a1_reg, uin
     switch (v0_value) {
         case 1: // print_int
             output_int = *a0_reg;
-            outFile << output_int;
+            //outFile << output_int;
+            cout << output_int;
             break;
         case 4: // print_string
             while ((*ch_ptr) != '\0'){
                 output_str += *ch_ptr;
                 ch_ptr++;
             }
-            outFile << output_str;
+            //outFile << output_str;
+            cout << output_str;
             break;
         case 5: // read_int
             getline(inFile, input_line);
@@ -704,11 +706,12 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* a1_reg, uin
         case 10: // exit
             inFile.close();
             outFile.close();
-            cout << "Execution finished." << endl;
+            //cout << "Execution finished." << endl;
             exit(EXIT_SUCCESS);
             break;
         case 11: // print_char
-            outFile << (char) ((*a0_reg) & 0x000000ff);
+            //outFile << (char) ((*a0_reg) & 0x000000ff);
+            cout << (char) ((*a0_reg) & 0x000000ff);
             break;
         case 12: // read_char
             getline(inFile, input_line);

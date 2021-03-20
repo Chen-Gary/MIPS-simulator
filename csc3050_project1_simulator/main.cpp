@@ -16,6 +16,8 @@ int main(int argc, char** argv) {
     asmFile.open( argv[1] );
     inFile.open( argv[2] );
     outFile.open( argv[3] );
+    //freopen(argv[2], "r", stdin);
+    freopen(argv[3], "w", stdout); // redirect output (Note that here stdin is not redirected)
 
     // read the input asm file line by line (into a vector)
     // separate the file into two segment, .data and .text
@@ -70,9 +72,4 @@ int main(int argc, char** argv) {
 //    cout << "rawTextSegment: " << endl;
 //    for (const string & oneline : rawTextSegment)
 //        cout << oneline << endl;
-
-
-    inFile.close();
-    outFile.close();
-    cout << "Execution finish." << endl;
 }
