@@ -3,6 +3,7 @@
  */
 
 #include <fcntl.h>
+#include <unistd.h>
 
 const uint64_t MAKS_LOWER_32 = 0x00000000ffffffff;
 
@@ -10,23 +11,27 @@ const uint64_t MAKS_LOWER_32 = 0x00000000ffffffff;
 // PC_realAddr - textSegmentStart = PC_fake - 0x400000 (in bytes)
 // *ra_reg = PC_fake!!
 uint32_t addrReal2Fake(uint32_t* PC_realAddr, uint32_t* textSegmentStart){
-    uint32_t offsetIn4Byte = PC_realAddr - textSegmentStart;
-    uint32_t fakeAddr = offsetIn4Byte * 4 + 0x400000;
+    uint32_t offsetIn1Byte = (uint8_t*) PC_realAddr - (uint8_t*) textSegmentStart;
+    uint32_t fakeAddr = offsetIn1Byte + 0x400000;
     return fakeAddr;
 }
 
 uint32_t* addrFake2Real(uint32_t fakeAddr, uint32_t* textSegmentStart){
-    uint32_t offsetIn4Byte = (fakeAddr - 0x400000) >> 2;
-    uint32_t* realAddr = textSegmentStart + offsetIn4Byte;
-    return realAddr;
+    uint32_t offsetIn1Byte = fakeAddr - 0x400000;
+    uint8_t* textSegmentStartByte = (uint8_t*) textSegmentStart;
+    uint8_t* realAddrByte = textSegmentStartByte + offsetIn1Byte;
+    return (uint32_t*) realAddrByte;
 }
 
 
 // 1. add
 void add_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
-    *rd = *rs + *rt;
+    *rd = (int32_t) (*rs) + (int32_t) (*rt);
 
-    //(OVERFLOW TRAP)
+    if ( ((*rs)&0x80000000) == ((*rt)&0x80000000) && ((*rd)&0x80000000) != ((*rt)&0x80000000) ){
+        cout << "add_toExecute(): OVERFLOW TRAP" << endl;
+        throw;
+    }
 }
 // 2. addu
 void addu_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
@@ -34,9 +39,12 @@ void addu_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
 }
 // 3. addi
 void addi_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended){
-    *rt = *rs + imm_signExtended;
+    *rt = (int32_t) (*rs) + imm_signExtended;
 
-    //(OVERFLOW TRAP)
+    if ( ((*rs)&0x80000000) == (imm_signExtended&0x80000000) && ((*rt)&0x80000000) != ((*rs)&0x80000000) ){
+        cout << "addi_toExecute(): OVERFLOW TRAP" << endl;
+        throw;
+    }
 }
 // 4. addiu
 void addiu_toExecute(uint32_t* rs, uint32_t* rt, int32_t imm_signExtended){
@@ -75,22 +83,39 @@ void clz_toExecute(uint32_t* rs, uint32_t* rd){
 }
 // 9. div
 void div_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* hi_reg, uint32_t* lo_reg){
-    // *rs / *rt
-    *lo_reg = (*rs) / (*rt); // quotient
-    *hi_reg = (*rs) % (*rt); // remainder
+    // check overflow ???
+    if (*rt == 0){
+        cout << "div_toExecute(): OVERFLOW TRAP - divide by zero" << endl;
+        throw;
+    }
 
-    //(OVERFLOW TRAP)
+    // *rs / *rt
+    *lo_reg = (int32_t) (*rs) / (int32_t) (*rt); // quotient
+    *hi_reg = (int32_t) (*rs) % (int32_t) (*rt); // remainder
 }
 // 10. divu
 void divu_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* hi_reg, uint32_t* lo_reg){
+    // check overflow ???
+    if (*rt == 0){
+        cout << "div_toExecute(): OVERFLOW TRAP - divide by zero" << endl;
+        throw;
+    }
+
     *lo_reg = (*rs) / (*rt); // quotient
     *hi_reg = (*rs) % (*rt); // remainder
 }
 // 11. mult
 void mult_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* hi_reg, uint32_t* lo_reg){
-    int64_t x = *rs;
-    int64_t y = *rt;
+    int64_t x = (int32_t) *rs;
+    int64_t y = (int32_t) *rt;
     int64_t result = x * y;
+
+    // check overflow
+    if (x != 0 && y != 0 && result / x != y){
+        cout << "mult_toExecute(): OVERFLOW TRAP" << endl;
+        throw;
+    }
+
     *lo_reg = result & MAKS_LOWER_32;
     *hi_reg = (result >> 32) & MAKS_LOWER_32;
 }
@@ -99,17 +124,28 @@ void multu_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* hi_reg, uint32_t* lo_
     uint64_t x = *rs;
     uint64_t y = *rt;
     uint64_t result = x * y;
+
+    // check overflow
+    if (x != 0 && y != 0 && result / x != y){
+        cout << "mult_toExecute(): OVERFLOW TRAP" << endl;
+        throw;
+    }
+
     *lo_reg = result & MAKS_LOWER_32;
     *hi_reg = (result >> 32) & MAKS_LOWER_32;
 }
 // 13. mul
 void mul_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
-    *rd = (*rs) * (*rt);
+    int64_t x = (int32_t) *rs;
+    int64_t y = (int32_t) *rt;
+    int64_t result = x * y;
+
+    *rd = result & MAKS_LOWER_32;
 }
 // 14. madd
 void madd_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* hi_reg, uint32_t* lo_reg){
-    int64_t x = *rs;
-    int64_t y = *rt;
+    int64_t x = (int32_t) *rs;
+    int64_t y = (int32_t) *rt;
     int64_t result = x * y;
 
     uint64_t hi = *hi_reg;
@@ -123,8 +159,8 @@ void madd_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* hi_reg, uint32_t* lo_r
 }
 // 15. msub
 void msub_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* hi_reg, uint32_t* lo_reg){
-    int64_t x = *rs;
-    int64_t y = *rt;
+    int64_t x = (int32_t) *rs;
+    int64_t y = (int32_t) *rt;
     int64_t result = x * y;
 
     uint64_t hi = *hi_reg;
@@ -209,9 +245,16 @@ void srlv_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
 }
 // 27.sub
 void sub_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
-    *rd = (*rs) - (*rt);
+    int32_t x = (int32_t) *rs;
+    int32_t y = (int32_t) *rt;
+    int32_t result = x - y;
+    *rd = result;
 
-    //(OVERFLOW TRAP)
+    // check overflow
+    if ((result<x) != (y>0)){
+        cout << "sub_toExecute(): OVERFLOW TRAP" << endl;
+        throw;
+    }
 }
 // 28.subu
 void subu_toExecute(uint32_t* rs, uint32_t* rt, uint32_t* rd){
@@ -605,7 +648,7 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* a1_reg, uin
     char* ch_ptr = (char*) realAddr;
 
     // case 5
-    int input;
+    int input_int;
 
     // case 8
     uint32_t buffer_a0 = *a0_reg;
@@ -613,7 +656,7 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* a1_reg, uin
     uint32_t length_a1 = *a1_reg;
 
     // case 12
-    char inputChar;
+    char input_char;
 
     //case 14, 15, 16
     uint32_t file_descriptor = *a0_reg;
@@ -632,11 +675,11 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* a1_reg, uin
             }
             break;
         case 5: // read_int // change IO
-            cin >> input;
-            *v0_reg = input;
+            cin >> input_int;
+            *v0_reg = input_int;
             break;
-        case 8: // read_string
-            //fgets(realBufferAddr_a0, length_a1);
+        case 8: // read_string // change IO
+            //... (not implemented)
             break;
         case 9: // sbrk
             *v0_reg = addrReal2Fake( (uint32_t*) dynamicDataSegmentCurrent, textSegmentStart);
@@ -645,30 +688,27 @@ void syscall_toExecute(uint32_t* v0_reg, uint32_t* a0_reg, uint32_t* a1_reg, uin
         case 10: // exit
             exit(EXIT_SUCCESS);
             break;
-        case 11: // print_char
-            printf("%c", (*a0_reg));
+        case 11: // print_char // change IO
+            printf("%c", ((*a0_reg) & 0x000000ff));
             break;
-        case 12:
-            cin >> inputChar;
-            *v0_reg = (uint8_t) inputChar;
+        case 12: // read_char // change IO
+            cin >> input_char;
+            *v0_reg = (uint8_t) input_char;
             break;
         case 13: // open
-            //open();
+            *v0_reg = open( (char*) a0_reg, (int) *a1_reg, (mode_t) *a2_reg);
             break;
         case 14: // read
-            read(file_descriptor, realBufferAddr_a1, length_a2);
+            *v0_reg = read(file_descriptor, realBufferAddr_a1, length_a2);
             break;
         case 15: // write
-            write(file_descriptor, realBufferAddr_a1, length_a2);
-//            for (uint32_t i=0; i<length_a2; i++){
-//                printf("%c", *(realBufferAddr_a1+i));
-//            }
+            *v0_reg = write(file_descriptor, realBufferAddr_a1, length_a2);
             break;
         case 16: // close
             close(file_descriptor);
             break;
-        case 17:
-            // exit2
+        case 17: // exit2
+            exit(2);
             break;
         default:
             cout << "Error in syscall instruction: invalid value in $v0!!!" << endl;

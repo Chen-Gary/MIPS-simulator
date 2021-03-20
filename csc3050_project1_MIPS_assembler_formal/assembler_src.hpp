@@ -81,7 +81,11 @@ string shamtStrToBinary(const string & str){ // I am not sure how to deal with s
 string label2offset16bit(const string & label, int currentLineNum, const map<string, int> & label2offset){
     // get the lineNum of target line of instruction
     // ranging from {0, 1, 2,...}
-    int targetLineNum = label2offset.find(label)->second;
+    int targetLineNum;
+    if (isdigit(label[0]))
+        targetLineNum = currentLineNum + stoi(label, nullptr, 0) + 1;
+    else
+        targetLineNum = label2offset.find(label)->second;
     // PC = PC + 4 + offset*4
     // offset = targetLineNum - currentLineNum - 1
     int difference = targetLineNum - currentLineNum - 1;
