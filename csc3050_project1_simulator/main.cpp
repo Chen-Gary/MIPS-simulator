@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv) {
 
-    // Three arguments should be include to execute this program (asm file, in file, out file)
+    // Three arguments should be included to execute this program (asm file, in file, out file)
     // sample command: ./simulator input_mips.asm input_mips.in input_mips.out
     if (argc < 4){
         cout << "Wrong number of arguments" << endl;
