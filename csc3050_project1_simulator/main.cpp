@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
     if (argc < 4){
         cout << "Wrong number of arguments" << endl;
     }
-    cout << "Program starts..." << endl;
+    //cout << "Program starts..." << endl;
 
     ifstream asmFile;
     asmFile.open( argv[1] );
