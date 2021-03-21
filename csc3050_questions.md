@@ -1,22 +1,3 @@
-*For instructions with trap (i.e. ==**overflow trap**==), print out the error message and terminate the program execution.
-
-//(OVERFLOW TRAP)
-
-```
-add
-addi
-div
-sub
-```
-
----
-
-// change IO (`syscall_toExecute`+ input file)
-
-
-
----
-
 what I can use in `simulator_instruction_functions.hpp`
 
 ```c++
@@ -44,17 +25,5 @@ uint32_t shamt
 uint32_t target
     
 uint32_t* textSegmentStart
-```
-
----
-
-// I do not know
-
-```
-swl
-swr
-
-syscall:
-
 ```
 
