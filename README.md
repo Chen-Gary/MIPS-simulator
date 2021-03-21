@@ -1,2 +1,2 @@
-# srcBackup
-Backup of my code
+# MIPS simulator
+MIPS simulator
