@@ -1,0 +1,13 @@
+./simulator 1.asm 1.in 1.out
+
+./simulator 2.asm 2.in 2.out
+
+./simulator 3.asm 3.in 3.out
+
+./simulator hanoi.asm hanoi.in hanoi.out
+
+./simulator last1.asm last1.in last1.out
+
+./simulator many_tests.asm many_tests.in many_tests.out
+
+./simulator sequence.asm sequence.in sequence.out

@@ -1,2 +1,2 @@
-# MIPS simulator
-MIPS simulator
+# MIPS assembler & simulator
+MIPS assembler & simulator
